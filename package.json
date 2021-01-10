@@ -1,5 +1,5 @@
 {
-  "name": "@geldmacher/cake-to-cointracking-converter",
+  "name": "cake-to-cointracking-converter",
   "version": "0.0.1",
   "description": "Converts Cake CSV exports to compatible CoinTracking CSV imports",
   "main": "./processCsv.js",
@@ -12,9 +12,6 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/geldmacher/Cake-to-CoinTracking-Converter.git"
-  },
-  "publishConfig": {
-    "registry":"https://npm.pkg.github.com"
   },
   "keywords": [
     "cake",
