@@ -103,8 +103,7 @@ const processCsv = (cakeCsvPath, ctCsvPath) => {
         format: 'Progress [{bar}] {percentage}% | ETA: {eta}s | {value}/{total}',
         barCompleteChar: '\u2588',
         barIncompleteChar: '\u2591',
-        hideCursor: true,
-        eof: false
+        hideCursor: true
     });
 
     const cakeCsvStream = fs.createReadStream(cakeCsvFile);
@@ -134,7 +133,8 @@ const processCsv = (cakeCsvPath, ctCsvPath) => {
         .on('end', () => {
             stringify(records, {
                 header: true,
-                quoted: true
+                quoted: true,
+                eof: false
             }, (error, output) => {
                 if (error) {
                     console.error('\n' + error);
