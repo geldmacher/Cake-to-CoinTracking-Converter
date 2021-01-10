@@ -6,7 +6,7 @@ CLI script to convert [Cake](https://pool.cakedefi.com/#?ref=401824) export data
 
 Install via npm:
 ```shell
-npm install @geldmacher/cake-to-cointracking-converter
+npm install cake-to-cointracking-converter
 ```
 
 ## Usage
