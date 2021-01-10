@@ -1,0 +1,41 @@
+{
+  "name": "@geldmacher/cake-to-cointracking-converter",
+  "version": "0.0.1",
+  "description": "Converts Cake CSV exports to compatible CoinTracking CSV imports",
+  "main": "./processCsv.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "cake2ct": "./bin/cake2ct.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geldmacher/Cake-to-CoinTracking-Converter.git"
+  },
+  "keywords": [
+    "cake",
+    "cointracking",
+    "crypto",
+    "cryptocurrency",
+    "dfi",
+    "defichain",
+    "taxes",
+    "lapis",
+    "staking",
+    "liquidity mining",
+    "defi"
+  ],
+  "author": "Dennis Geldmacher",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/geldmacher/Cake-to-CoinTracking-Converter/issues"
+  },
+  "homepage": "https://github.com/geldmacher/Cake-to-CoinTracking-Converter#readme",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-stringify": "^5.6.0",
+    "cli-progress": "^3.8.2",
+    "yargs": "^16.2.0"
+  }
+}
