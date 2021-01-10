@@ -1,6 +1,6 @@
 {
   "name": "cake-to-cointracking-converter",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Converts Cake CSV exports to compatible CoinTracking CSV imports",
   "main": "./processCsv.js",
   "scripts": {
