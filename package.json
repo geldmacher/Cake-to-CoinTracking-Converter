@@ -13,6 +13,9 @@
     "type": "git",
     "url": "git+https://github.com/geldmacher/Cake-to-CoinTracking-Converter.git"
   },
+  "publishConfig": {
+    "registry":"https://npm.pkg.github.com"
+  },
   "keywords": [
     "cake",
     "cointracking",
