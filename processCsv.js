@@ -3,8 +3,10 @@ const path = require('path');
 const csv = require('csv-parser');
 const stringify = require('csv-stringify');
 const cliProgress = require('cli-progress');
+const { v5: uuidv5 } = require('uuid');
+var Decimal = require('decimal.js');
 
-const generateCtRecordsFromCakeDataRow = function(row) {
+const generateCtRecordsFromCakeDataRow = function(row, lastHandledRecords) {
 
     const records = [];
     const data = {
@@ -49,13 +51,26 @@ const generateCtRecordsFromCakeDataRow = function(row) {
             data['Type'] = 'Staking';
             data['Trade-Group'] = 'Staking';
             data['Buy Currency'] = row['Cryptocurrency'];
-            data['Buy Amount'] = row['Amount'];
+            // Merge staking data rows by day
+            // Otherwise there a way too much of them
+            const date = new Date(row['Date']);
+            const dateAtMidnight = new Date(date.setHours(24,0,0,0)).toISOString();
+            data['Date'] = dateAtMidnight;
+            // Generate own uuid to identify other records from same day
+            // https://www.uuidgenerator.net/
+            data['Tx-ID'] = uuidv5((data['Comment'] + '-' + data['Date']), '82f84ac6-c3c4-4de5-8d70-a7ce0aacde4f');
+            if(data['Tx-ID'] === lastHandledRecords[0]['Tx-ID']){
+                data['Buy Amount'] = new Decimal(row['Amount']).plus(lastHandledRecords[0]['Buy Amount']).toNumber();
+                
+            } else {
+                data['Buy Amount'] = row['Amount'];
+            }
             break;
         case 'Unstake fee':
             data['Type'] = 'Sonstige Gebühr';
             data['Trade-Group'] = 'Staking';
             data['Sell Currency'] = row['Cryptocurrency'];
-            data['Sell Amount'] = row['Amount'] * -1;
+            data['Sell Amount'] = row['Amount'].replace('-','');
             break;
         case 'Bonus/Airdrop':
             data['Type'] = 'Airdrop';
@@ -72,14 +87,14 @@ const generateCtRecordsFromCakeDataRow = function(row) {
             'Type': 'Einzahlung',
             'Trade-Group': 'Liquidity Mining',
             'Buy Currency': row['Cryptocurrency'],
-            'Buy Amount': row['Amount'] * -1
+            'Buy Amount': row['Amount'].replace('-','')
         };
         records.push(additionalData);
 
         data['Type'] = 'Auszahlung';
         data['Trade-Group'] = 'Liquidity Mining';
         data['Sell Currency'] = row['Cryptocurrency'];
-        data['Sell Amount'] = row['Amount'] * -1;
+        data['Sell Amount'] = row['Amount'].replace('-','');
     }
 
     // Handle "Liquidity mining reward AAA-BBB"
@@ -109,18 +124,26 @@ const processCsv = (cakeCsvPath, ctCsvPath) => {
     const cakeCsvStream = fs.createReadStream(cakeCsvFile);
 
     let records = [];
+    let lastHandledRecords;
 
     progressBar.start(1, 0);
 
     cakeCsvStream
         .pipe(csv())
         .on('data', row => {
-            const transformedRecords = generateCtRecordsFromCakeDataRow(row);
-            if(transformedRecords){
-                records = [...records, ...transformedRecords];
+            lastHandledRecords = generateCtRecordsFromCakeDataRow(row, lastHandledRecords, records);
+            if(lastHandledRecords){
+                // Delete last handled records from records
+                records = records.filter(record => {
+                    if(record['Tx-ID'] === lastHandledRecords[0]['Tx-ID']){
+                        return false;
+                    } 
+                    return true;
+                });
+                records = [...records, ...lastHandledRecords];
                 progressBar.setTotal(records.length);
                 progressBar.updateETA();
-                progressBar.increment(transformedRecords.length);
+                progressBar.increment(lastHandledRecords.length);
             } else {
                 console.info('\n' + 'No Cake records found');
                 progressBar.stop();
