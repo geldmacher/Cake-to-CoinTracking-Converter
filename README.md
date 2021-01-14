@@ -16,6 +16,10 @@ Via shell:
 cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\ct-import-file.csv"
 ```
 
+## Features
+
+- Compounding staking rewards for each day (Timestamp at midnight) to reduce CoinTracking imports
+
 ## Supported Cake operations
 
 - Deposit
