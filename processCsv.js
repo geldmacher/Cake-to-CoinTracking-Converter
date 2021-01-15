@@ -4,7 +4,7 @@ const csv = require('csv-parser');
 const stringify = require('csv-stringify');
 const cliProgress = require('cli-progress');
 const { v5: uuidv5 } = require('uuid');
-var Decimal = require('decimal.js');
+const Decimal = require('decimal.js');
 
 // CoinTracking type fields need to be in the language of your CoinTracking UI
 const ctType = {
