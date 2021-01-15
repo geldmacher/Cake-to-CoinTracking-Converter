@@ -6,7 +6,42 @@ const cliProgress = require('cli-progress');
 const { v5: uuidv5 } = require('uuid');
 var Decimal = require('decimal.js');
 
-const generateCtRecordsFromCakeDataRow = function(row, lastHandledRecords) {
+// CoinTracking type fields need to be in the language of your CoinTracking UI
+const ctType = {
+    de: {
+        deposit: 'Einzahlung',
+        withdrawal: 'Auszahlung',
+        lending_income: 'Lending Einnahme',
+        interest_income: 'Zinsen',
+        staking: 'Staking',
+        other_fee: 'Sonstige Gebühr',
+        airdrop: 'Airdrop',
+        income: 'Einnahme',
+        expense_non_taxable: 'Ausgabe (steuerfrei)',
+        expense: 'Ausgabe'
+    },
+    en: {
+        deposit: 'Deposit',
+        withdrawal: 'Withdrawal',
+        lending_income: 'Lending Income',
+        interest_income: 'Interest Income',
+        staking: 'Staking',
+        other_fee: 'Other Fee',
+        airdrop: 'Airdrop',
+        income: 'Income',
+        expense_non_taxable: 'Expense (non taxable)',
+        expense: 'Expense'
+    }
+};
+
+/**
+ * Translate Cake records to CoinTracking records
+ * 
+ * @param {*} row 
+ * @param {*} lastHandledRecords 
+ * @param {*} translatedCtTypes 
+ */
+const generateCtRecordsFromCakeDataRow = function(row, lastHandledRecords, translatedCtTypes) {
 
     const records = [];
     const data = {
@@ -20,46 +55,54 @@ const generateCtRecordsFromCakeDataRow = function(row, lastHandledRecords) {
         'Exchange': 'Cake',
         'Trade-Group': '',
         'Comment': row['Operation'],
-        'Date': row['Date'],
+        'Date': new Date(row['Date']).toISOString(),
         'Tx-ID': row['Reference']
     };
 
     switch(row['Operation']){
         case 'Deposit':
-            data['Type'] = 'Einzahlung';
+            data['Type'] = translatedCtTypes.deposit;
+            data['Trade-Group'] = 'Deposit';
             data['Buy Currency'] = row['Cryptocurrency'];
             data['Buy Amount'] = row['Amount'];
             break;
         case 'Withdrawal': 
-            data['Type'] = 'Auszahlung';
+            data['Type'] = translatedCtTypes.withdrawal;
+            data['Trade-Group'] = 'Withdrawal';
             data['Sell Currency'] = row['Cryptocurrency'];
-            data['Sell Amount'] = row['Amount'];
+            data['Sell Amount'] = row['Amount'].replace('-','');
+            break;
+        case 'Withdrawal fee':
+            data['Type'] = translatedCtTypes.other_fee;
+            data['Trade-Group'] = 'Withdrawal';
+            data['Sell Currency'] = row['Cryptocurrency'];
+            data['Sell Amount'] = row['Amount'].replace('-','');
             break;
         case 'Lapis reward':
-            data['Type'] = 'Lending Einnahme';
+            data['Type'] = translatedCtTypes.lending_income;
             data['Trade-Group'] = 'Lapis';
             data['Buy Currency'] = row['Cryptocurrency'];
             data['Buy Amount'] = row['Amount'];
             break;
         case 'Lapis DFI Bonus':
-            data['Type'] = 'Zinsen';
+            data['Type'] = translatedCtTypes.interest_income;
             data['Trade-Group'] = 'Lapis';
             data['Buy Currency'] = row['Cryptocurrency'];
             data['Buy Amount'] = row['Amount'];
             break;
         case 'Staking reward':
-            data['Type'] = 'Staking';
+            data['Type'] = translatedCtTypes.staking;
             data['Trade-Group'] = 'Staking';
             data['Buy Currency'] = row['Cryptocurrency'];
-            // Merge staking data rows by day
+            // Merge staking data rows by day at 24 o'clock
             // Otherwise there a way too much of them
             const date = new Date(row['Date']);
             const dateAtMidnight = new Date(date.setHours(24,0,0,0)).toISOString();
             data['Date'] = dateAtMidnight;
             // Generate own uuid to identify other records from same day
-            // https://www.uuidgenerator.net/
+            // Unique namespace -> https://www.uuidgenerator.net/
             data['Tx-ID'] = uuidv5((data['Comment'] + '-' + data['Date']), '82f84ac6-c3c4-4de5-8d70-a7ce0aacde4f');
-            if(data['Tx-ID'] === lastHandledRecords[0]['Tx-ID']){
+            if(lastHandledRecords && lastHandledRecords[0] && data['Tx-ID'] === lastHandledRecords[0]['Tx-ID']){
                 data['Buy Amount'] = new Decimal(row['Amount']).plus(lastHandledRecords[0]['Buy Amount']).toNumber();
                 
             } else {
@@ -67,42 +110,40 @@ const generateCtRecordsFromCakeDataRow = function(row, lastHandledRecords) {
             }
             break;
         case 'Unstake fee':
-            data['Type'] = 'Sonstige Gebühr';
+            data['Type'] = translatedCtTypes.other_fee;
             data['Trade-Group'] = 'Staking';
             data['Sell Currency'] = row['Cryptocurrency'];
             data['Sell Amount'] = row['Amount'].replace('-','');
             break;
         case 'Bonus/Airdrop':
-            data['Type'] = 'Airdrop';
+            data['Type'] = translatedCtTypes.airdrop;
             data['Trade-Group'] = 'Bonus/Airdrop';
             data['Buy Currency'] = row['Cryptocurrency'];
             data['Buy Amount'] = row['Amount'];
             break;
-    }
-
-    // Handle "Add liquidity AAA-BBB"
-    if(/^Add liquidity [A-Z]{3}-[A-Z]{3}$/.test(row['Operation'])){
-        const additionalData = {
-            ...data,
-            'Type': 'Einzahlung',
-            'Trade-Group': 'Liquidity Mining',
-            'Buy Currency': row['Cryptocurrency'],
-            'Buy Amount': row['Amount'].replace('-','')
-        };
-        records.push(additionalData);
-
-        data['Type'] = 'Auszahlung';
-        data['Trade-Group'] = 'Liquidity Mining';
-        data['Sell Currency'] = row['Cryptocurrency'];
-        data['Sell Amount'] = row['Amount'].replace('-','');
-    }
-
-    // Handle "Liquidity mining reward AAA-BBB"
-    if(/^Liquidity mining reward [A-Z]{3}-[A-Z]{3}$/.test(row['Operation'])){
-        data['Type'] = 'Einnahme';
-        data['Trade-Group'] = 'Liquidity Mining';
-        data['Buy Currency'] = row['Cryptocurrency'];
-        data['Buy Amount'] = row['Amount'];
+        default:
+            let notHandledOperation = row['Operation'];
+            // Handle "Add liquidity AAA-BBB"
+            if(/^Add liquidity [A-Z]{3}-[A-Z]{3}$/.test(row['Operation'])){
+                data['Type'] = translatedCtTypes.expense;
+                data['Trade-Group'] = 'Liquidity Mining';
+                data['Sell Currency'] = row['Cryptocurrency'];
+                data['Sell Amount'] = row['Amount'].replace('-','');
+                notHandledOperation = null;
+            } 
+            // Handle "Liquidity mining reward AAA-BBB"
+            if(/^Liquidity mining reward [A-Z]{3}-[A-Z]{3}$/.test(row['Operation'])){
+                data['Type'] = translatedCtTypes.income;
+                data['Trade-Group'] = 'Liquidity Mining';
+                data['Buy Currency'] = row['Cryptocurrency'];
+                data['Buy Amount'] = row['Amount'];
+                notHandledOperation = null;
+            }
+            // Let us know which operation we are currently not supporting
+            if(notHandledOperation){
+                console.info('\n' + 'Not able to handle the "' + notHandledOperation + '" operation from Cake atm.');
+            }
+        break;
     }
 
     records.push(data);
@@ -110,7 +151,17 @@ const generateCtRecordsFromCakeDataRow = function(row, lastHandledRecords) {
     return records;
 }
 
-const processCsv = (cakeCsvPath, ctCsvPath) => {
+/**
+ * Process the Cake CSV export and generate the CoinTracking CSV import
+ * 
+ * @param {*} cakeCsvPath 
+ * @param {*} ctCsvPath 
+ * @param {*} language 
+ */
+const processCsv = (cakeCsvPath, ctCsvPath, language) => {
+
+    const translatedCtTypes = (language === 'de' || language === 'en') ? ctType[language] : ctType['en'];
+
     const cakeCsvFile = path.resolve(cakeCsvPath);
     const ctCsvFile = path.resolve(ctCsvPath);
 
@@ -131,7 +182,7 @@ const processCsv = (cakeCsvPath, ctCsvPath) => {
     cakeCsvStream
         .pipe(csv())
         .on('data', row => {
-            lastHandledRecords = generateCtRecordsFromCakeDataRow(row, lastHandledRecords, records);
+            lastHandledRecords = generateCtRecordsFromCakeDataRow(row, lastHandledRecords, translatedCtTypes);
             if(lastHandledRecords){
                 // Delete last handled records from records
                 records = records.filter(record => {
