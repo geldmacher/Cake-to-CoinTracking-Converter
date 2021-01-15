@@ -5,8 +5,6 @@ CLI script to translate [Cake](https://pool.cakedefi.com/#?ref=401824) export da
 **IMPORTANT**: Make a backup of your trades before you import new data via this script! This script is still in an early beta state. ;) \
 **EVEN MORE IMPORTANT**: This is no tax advice! The way this script imports data is potentially wrong.
 
----
-
 > **Liquidity Mining** \
 > At the moment there is no clean way to import the "Add luquidty to AAA-BBB" operations from Cake. \
 > In my understanding adding liquidity to a pool should result in a trade of AAA and BBB against the AAA-BBB liquidity pool token (The value of this token should be the added values of AAA and BBB at the moment of the trade). \
