@@ -11,7 +11,7 @@ CLI script to translate [Cake](https://pool.cakedefi.com/#?ref=401824) export da
 > This scripts handles this currently diffrent because of several reasons. AAA and BBB are imported as an expense (so taxation might apply to this). Nothing else is imported. No AAA-BBB Token, no AAA or BBB Coin/Token. \
 > \
 > The important part: \
-> This scripts does currently not support extracting AAA or BBB from the liquidity pool. I wrote this script just for my self and i don't plan to do this in the foreseeable future. Feel free to send me ideas and thoughts on this. I would love to optimize this.
+> This scripts does currently not support extracting AAA or BBB from the liquidity pool. Feel free to send me ideas and thoughts on this. I would love to add this.
 
 ## Features
 
