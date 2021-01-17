@@ -6,17 +6,19 @@ CLI script to translate [Cake](https://pool.cakedefi.com/#?ref=401824) export da
 **EVEN MORE IMPORTANT**: This is no tax advice! The way this script imports data is potentially wrong.
 
 > **Liquidity Mining** \
-> At the moment there is no clean way to import the "Add liquidity to AAA-BBB" operations from Cake. \
-> In my understanding adding liquidity to a pool should result in a trade of AAA and BBB against the AAA-BBB liquidity pool token (The value of this token should be the added values of AAA and BBB at the moment of the trade). \
-> This scripts handles this currently diffrent because of several reasons. AAA and BBB are imported as an expense (so taxation might apply to this). Nothing else is imported. No AAA-BBB Token, no AAA or BBB Coin/Token. \
+> At the moment there is no clean way to import the "Add/Remove liquidity to AAA-BBB" operations from Cake. \
+> In my understanding adding liquidity to a pool should result in a trade of AAA and BBB against the AAA-BBB liquidity pool token (The value of this token should be the added values of AAA and BBB at the moment of the trade). Removing liquidity should result in a trade from AAA-BBB against AAA and BBB. \
+> This scripts handles this currently diffrent because of several reasons. AAA and BBB are imported as an expense or income (so taxation might apply to this). Nothing else is imported. No AAA-BBB Token, no AAA or BBB Coin/Token. So if you add liquidity to a pool AAA and BBB are going into a blackbox and reappear from there when you remove them from the pool. \
+> This results in a bad taxation situation, because removing from a pool results in a 100% taxable income for AAA and BBB.
 > \
-> The important part: \
-> This scripts does currently not support extracting AAA or BBB from the liquidity pool. Feel free to send me ideas and thoughts on this. I would love to add this.
+> Atm i have no clue how to handle this better, because i am missing some data from Cake to do it better. I would need the size of the pool share i receive or lose and its USD valuation at the moment of the transaction. \
+> Feel free to send me ideas and thoughts on this. I would love to optimize this.
 
 ## Features
 
-- Combines staking rewards on a daily basis at midnight to reduce the number of CoinTracking imports
-- Supports german and english CoinTracking import
+- Combines staking rewards on a daily basis at midnight to reduce the number of CoinTracking imports.
+- Supports german and english CoinTracking import.
+- [**experimental**] Uses Cake's FIAT valuation for each transaction in USD and converts it to other currencies if needed.
 
 ## Installation
 
@@ -33,7 +35,7 @@ Get your [Cake export CSV](https://pool.cakedefi.com/#/transactions) for each co
 
 Via shell:
 ```shell
-cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\ct-import-file.csv" --lang "de"
+cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\ct-import-file.csv" --language "DE"
 ```
 
 [Import](https://cointracking.info/import/import_csv/) the generated CoinTracking Csv. Just select your file, check your imports on the next page and import your data if everthing is fine.
@@ -42,7 +44,8 @@ cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\ct-import-fi
 
 - `--cake-csv` - Path to Cake CSV.
 - `--ct-csv` - Path to CoinTracking CSV.
-- `--lang` - Used language for Coinracking import file. `de` and `en` are supported.
+- `--language` (optional) - Used language for CoinTracking import file. "DE" and "EN" are supported. Default is "EN".
+- `--currency` (optional, **experimental**) - Used currency for CoinTracking import file. Default is "USD".
 
 ## Supported Cake operations
 
@@ -55,6 +58,7 @@ cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\ct-import-fi
 - Unstake fee
 - Bonus/Airdrop
 - Add liquidity XXX-YYY
+- Remove liquidity XXX-YYY
 - Liquidity mining reward XXX-YYY
 
 ---
