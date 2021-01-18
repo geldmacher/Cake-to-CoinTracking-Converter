@@ -31,7 +31,7 @@ npm install cake-to-cointracking-converter
 
 ## Usage
 
-Get your [Cake export CSV](https://pool.cakedefi.com/#/transactions) for each coin and generate a CoinTracking import SV for each.
+Get your [Cake export CSV](https://pool.cakedefi.com/#/transactions) for each coin and generate a CoinTracking import CSV for each.
 
 Via shell:
 ```shell
