@@ -1,5 +1,0 @@
-Date,Operation,Cryptocurrency,Amount,Transaction ID,Withdrawal address,Reference
-"2020-12-02T01:00:00+01:00","Liquidity mining reward BTC-DFI","BTC","0.00000787","","","0e10ba30-572a-4acc-8748-694c1cde214f"
-"2020-12-01T06:54:06+01:00","Add liquidity BTC-DFI","BTC","-0.1","","","9fa7b55b-738d-4671-88f5-41924c29b572"
-"2020-11-27T09:06:33+01:00","Lapis reward","BTC","0.00047963","","","037df41f-767a-4b26-b434-5c6b065ace04"
-"2020-03-11T20:40:37+01:00","Deposit","BTC","0.00727987","7fee8f6f6c21311ea90906a2af975620e70097ce80ffcfe3efc9d26e5f1a7a45","","1932d3cb-c236-4b10-aae4-97a55d4eb08c"

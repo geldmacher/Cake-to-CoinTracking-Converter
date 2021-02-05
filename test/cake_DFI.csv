@@ -1,7 +1,0 @@
-Date,Operation,Cryptocurrency,Amount,Transaction ID,Withdrawal address,Reference
-"2021-01-01T13:00:00+01:00","Liquidity mining reward BTC-DFI","DFI","24.71247816","","","70db8a42-9451-4464-824b-b5fc427eec33"
-"2021-01-01T11:35:19+01:00","Staking reward","DFI","0.09720673","","","96383952-6b0b-40dc-9142-accca146071c"
-"2020-12-31T19:51:10+01:00","Add liquidity BTC-DFI","DFI","-0.01557655","","","5588a6be-b776-4eb3-82c7-0edbd93f818c"
-"2020-12-28T22:01:03+01:00","Unstake fee","DFI","-0.275","","","a98f620f-7de4-49c8-82ba-ddb8e9054806"
-"2020-11-27T13:09:46+01:00","Lapis DFI Bonus","DFI","5.20383463","","","9c018262-cafc-476b-8399-3bc90631241e"
-"2020-05-13T11:18:26+02:00","Bonus/Airdrop","DFI","3743.06033554","","","02defe50-57b3-4b47-889b-a050232cfa5e"
