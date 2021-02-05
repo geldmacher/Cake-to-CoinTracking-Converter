@@ -38,7 +38,7 @@ Via shell:
 cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\ct-import-file.csv" --language "DE"
 ```
 
-[Import](https://cointracking.info/import/import_csv/) the generated CoinTracking Csv. Just select your file, check your imports on the next page and import your data if everthing is fine.
+[Import](https://cointracking.info/import/import_csv/) the generated CoinTracking CSV. Just select your file, check your imports on the next page and import your data if everthing is fine.
 
 ## Options
 

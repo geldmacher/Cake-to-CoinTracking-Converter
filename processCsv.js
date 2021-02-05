@@ -215,7 +215,7 @@ const generateCtRecordsFromCakeDataRow = async (row, lastHandledRecords, transla
                 }
                 // Let us know which operation we are currently not supporting
                 if(notHandledOperation){
-                    console.info('\n' + 'Not able to handle the Cake\'s "' + notHandledOperation + '" operation atm.');
+                    console.info('\n' + 'Not able to handle Cake\'s "' + notHandledOperation + '" operation atm.');
                 }
             break;
         }
