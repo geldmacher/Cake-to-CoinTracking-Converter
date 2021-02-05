@@ -267,17 +267,18 @@ const processCsv = async (cakeCsvPath, ctCsvPath, language, currency) => {
 
     cakeCsvStream
         .on('error', error => {
-            console.error('\n' + error);
             progressBar.stop();
+            console.error('\n' + error);
         })
         .pipe(csv())
         .on('error', error => {
-            console.error('\n' + error);
             progressBar.stop();
+            console.error('\n' + error);
         })
         .on('data', async row => {
             lastHandledRecords = await generateCtRecordsFromCakeDataRow(row, lastHandledRecords, translatedCtTypes, convertToCurrency);
-            if(lastHandledRecords){
+
+            if (lastHandledRecords) {
                 // Delete last handled records from records
                 records = records.filter(record => {
                     if(record['Tx-ID'] === lastHandledRecords[0]['Tx-ID']){
@@ -287,11 +288,11 @@ const processCsv = async (cakeCsvPath, ctCsvPath, language, currency) => {
                 });
                 records = [...records, ...lastHandledRecords];
                 progressBar.setTotal(records.length);
-                progressBar.updateETA();
                 progressBar.increment(lastHandledRecords.length);
+                progressBar.updateETA();
             } else {
-                console.info('\n' + 'No Cake records found');
                 progressBar.stop();
+                console.info('\n' + 'No Cake records found');
             }
         })
         .on('error', error => {
@@ -305,27 +306,28 @@ const processCsv = async (cakeCsvPath, ctCsvPath, language, currency) => {
                 eof: false
             }, (error, output) => {
                 if (error) {
-                    console.error('\n' + error);
                     progressBar.stop();
+                    console.error('\n' + error);
                 } else {
                     if(output){
                         fs.writeFile(ctCsvFile, output, error => {
+                            progressBar.stop();
                             if (error) {
                                 console.error('\n' + error);
                             } else {
                                 console.info('\n' + 'Done! Wrote Cake data to CoinTracking file.');
                             }
-                            progressBar.stop();
                         });
                     } else {
+                        progressBar.stop();
                         console.error('\n' + 'Could not write CoinTracking file.');
                     }
                 }
             })
         })
         .on('error', error => {
-            console.error('\n' + error);
             progressBar.stop();
+            console.error('\n' + error);
         });
 };
 
