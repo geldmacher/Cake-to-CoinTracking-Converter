@@ -18,6 +18,7 @@ const ctType = {
         staking: 'Staking',
         other_fee: 'Sonstige Gebühr',
         airdrop: 'Airdrop',
+        income_non_taxable: 'Einnahme (steuerfrei)',
         income: 'Einnahme',
         other_income: 'Sonstige Einnahme',
         expense_non_taxable: 'Ausgabe (steuerfrei)',
@@ -32,6 +33,7 @@ const ctType = {
         staking: 'Staking',
         other_fee: 'Other Fee',
         airdrop: 'Airdrop',
+        income_non_taxable: 'Income (non taxable)',
         income: 'Income',
         other_income: 'Other Income',
         expense_non_taxable: 'Expense (non taxable)',
@@ -88,8 +90,9 @@ const convertCurrency = async (value, from, to, date) => {
  * @param {*} lastHandledRecords 
  * @param {*} translatedCtTypes 
  * @param {*} currency 
+ * @param {*} noTaxOnLMOperations 
  */
-const generateCtRecordsFromCakeDataRow = async (row, lastHandledRecords, translatedCtTypes, currency) => {
+const generateCtRecordsFromCakeDataRow = async (row, lastHandledRecords, translatedCtTypes, currency, noTaxOnLMOperations) => {
 
     const records = [];
 
@@ -188,7 +191,7 @@ const generateCtRecordsFromCakeDataRow = async (row, lastHandledRecords, transla
                 let notHandledOperation = row['Operation'];
                 // Handle "Add liquidity AAA-BBB"
                 if(/^Add liquidity [A-Z]{3}-[A-Z]{3}$/.test(row['Operation'])){
-                    data['Type'] = translatedCtTypes.other_expense;
+                    data['Type'] = noTaxOnLMOperations ? translatedCtTypes.expense_non_taxable : translatedCtTypes.other_expense;
                     data['Trade-Group'] = 'Liquidity Mining';
                     data['Sell Currency'] = row['Cryptocurrency'];
                     data['Sell Amount'] = row['Amount'].replace('-','');
@@ -197,7 +200,7 @@ const generateCtRecordsFromCakeDataRow = async (row, lastHandledRecords, transla
                 } 
                 // Handle "Remove liquidity AAA-BBB"
                 if(/^Remove liquidity [A-Z]{3}-[A-Z]{3}$/.test(row['Operation'])){
-                    data['Type'] = translatedCtTypes.other_income;
+                    data['Type'] = noTaxOnLMOperations ? translatedCtTypes.income_non_taxable : translatedCtTypes.other_income;
                     data['Trade-Group'] = 'Liquidity Mining';
                     data['Buy Currency'] = row['Cryptocurrency'];
                     data['Buy Amount'] = row['Amount'].replace('-','');
@@ -235,8 +238,9 @@ const generateCtRecordsFromCakeDataRow = async (row, lastHandledRecords, transla
  * @param {*} ctCsvPath 
  * @param {*} language 
  * @param {*} currency 
+ * @param {*} noTaxOnLMOperations 
  */
-const processCsv = async (cakeCsvPath, ctCsvPath, language, currency) => {
+const processCsv = async (cakeCsvPath, ctCsvPath, language, currency, noTaxOnLMOperations) => {
 
     // EN is the default language
     const normalizedLanguage = (language) ? language.toLowerCase() : 'en';
@@ -276,7 +280,7 @@ const processCsv = async (cakeCsvPath, ctCsvPath, language, currency) => {
             console.error('\n' + error);
         })
         .on('data', async row => {
-            lastHandledRecords = await generateCtRecordsFromCakeDataRow(row, lastHandledRecords, translatedCtTypes, convertToCurrency);
+            lastHandledRecords = await generateCtRecordsFromCakeDataRow(row, lastHandledRecords, translatedCtTypes, convertToCurrency, noTaxOnLMOperations);
 
             if (lastHandledRecords) {
                 // Delete last handled records from records
