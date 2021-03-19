@@ -202,9 +202,9 @@ const generateCtRecordsFromCakeDataRow = (row, lastHandledRecords, translatedCtT
 const processCsv = async (cakeCsvPath, ctCsvPath, language, useCakeFiatValuation, noTaxOnLMTransferOperations) => {
 
     // EN is the default language
-    const normalizedLanguage = (language) ? language.toLowerCase() : 'en';
+    const normalizedLanguage = (language.length > 0) ? language.toLowerCase() : 'en';
     // only "de" and "en" are supported atm
-    const translatedCtTypes = (normalizedLanguage === 'de' || normalizedLanguage === 'en') ? ctType[language] : ctType['en'];
+    const translatedCtTypes = (normalizedLanguage === 'de' || normalizedLanguage === 'en') ? ctType[normalizedLanguage] : ctType['en'];
 
     const cakeCsvFile = path.resolve(cakeCsvPath);
     const ctCsvFile = path.resolve(ctCsvPath);
