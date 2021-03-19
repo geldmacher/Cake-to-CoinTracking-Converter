@@ -94,15 +94,17 @@ const generateCtRecordsFromCakeDataRow = (row, lastHandledRecords, translatedCtT
                 data['Sell Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
                 break;
             case 'Lapis reward':
+            case 'Lending reward':
                 data['Type'] = translatedCtTypes.lending_income;
-                data['Trade-Group'] = 'Lapis';
+                data['Trade-Group'] = 'Lending';
                 data['Buy Currency'] = row['Cryptocurrency'];
                 data['Buy Amount'] = row['Amount'].replace('-','');
                 data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
                 break;
             case 'Lapis DFI Bonus':
+            case 'Lending DFI Bonus':
                 data['Type'] = translatedCtTypes.interest_income;
-                data['Trade-Group'] = 'Lapis';
+                data['Trade-Group'] = 'Lending';
                 data['Buy Currency'] = row['Cryptocurrency'];
                 data['Buy Amount'] = row['Amount'].replace('-','');
                 data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
