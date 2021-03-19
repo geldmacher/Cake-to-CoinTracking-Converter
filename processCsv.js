@@ -5,8 +5,6 @@ const stringify = require('csv-stringify');
 const cliProgress = require('cli-progress');
 const { v5: uuidv5 } = require('uuid');
 const Decimal = require('decimal.js');
-const fx = require('money');
-const fetch = require('node-fetch')
 
 // CoinTracking type fields need to be in the language of your CoinTracking UI
 const ctType = {
@@ -42,57 +40,16 @@ const ctType = {
     }
 };
 
-// Cache conversion rates for minimum API access
-const cacheRates = [];
-
-/**
- * Convert currencies
- * @see https://api.exchangeratesapi.io/
- * 
- * @param {*} value 
- * @param {*} from 
- * @param {*} to 
- * @param {*} date 
- */
-const convertCurrency = async (value, from, to, date) => {
-    // If there is no concrete conversion, let CoinTracking handle the transaction price
-    if(!value || !from || !to){
-        return null;
-    }
-    if(from !== to){
-        let preparedDate = 'latest';
-        if(date){
-            const dateObject = new Date(date);
-            preparedDate = dateObject.getFullYear() + '-' + ('0' + (dateObject.getMonth() + 1)).slice(-2) + '-' + dateObject.getDate();
-        }
-        
-        let rates = cacheRates[preparedDate] ?? null;
-        if(!rates){
-            const response = await fetch('https://api.exchangeratesapi.io/' + preparedDate + '?base=USD');
-            if (!response.ok) {
-                throw('\n' + 'Currency comversion service currently not usable. Try again later or use default currency (USD).');
-            }
-            const data = await response.json();
-            rates = data.rates;
-            cacheRates[preparedDate] = rates;
-        } 
-
-        fx.rates = rates;
-        return fx(value).from(from).to(to);
-    } 
-    return value;
-}
-
 /**
  * Translate Cake records to CoinTracking records
  * 
  * @param {*} row 
  * @param {*} lastHandledRecords 
  * @param {*} translatedCtTypes 
- * @param {*} currency 
- * @param {*} noTaxOnLMOperations 
+ * @param {*} useCakeFiatValuation 
+ * @param {*} noTaxOnLMTransferOperations 
  */
-const generateCtRecordsFromCakeDataRow = async (row, lastHandledRecords, translatedCtTypes, currency, noTaxOnLMOperations) => {
+const generateCtRecordsFromCakeDataRow = (row, lastHandledRecords, translatedCtTypes, useCakeFiatValuation, noTaxOnLMTransferOperations) => {
 
     const records = [];
 
@@ -120,37 +77,38 @@ const generateCtRecordsFromCakeDataRow = async (row, lastHandledRecords, transla
                 data['Trade-Group'] = 'Deposit';
                 data['Buy Currency'] = row['Cryptocurrency'];
                 data['Buy Amount'] = row['Amount'].replace('-','');
-                data['Buy Value in your Account Currency'] = await convertCurrency(row['FIAT value'].replace('-',''), row['FIAT currency'], currency, data['Date']);
+                data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
                 break;
             case 'Withdrawal': 
                 data['Type'] = translatedCtTypes.withdrawal;
                 data['Trade-Group'] = 'Withdrawal';
                 data['Sell Currency'] = row['Cryptocurrency'];
                 data['Sell Amount'] = row['Amount'].replace('-','');
-                data['Sell Value in your Account Currency'] = await convertCurrency(row['FIAT value'].replace('-',''), row['FIAT currency'], currency, data['Date']);
+                data['Sell Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
                 break;
             case 'Withdrawal fee':
                 data['Type'] = translatedCtTypes.other_fee;
                 data['Trade-Group'] = 'Withdrawal';
                 data['Sell Currency'] = row['Cryptocurrency'];
                 data['Sell Amount'] = row['Amount'].replace('-','');
-                data['Sell Value in your Account Currency'] = await convertCurrency(row['FIAT value'].replace('-',''), row['FIAT currency'], currency, data['Date']);
+                data['Sell Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
                 break;
             case 'Lapis reward':
                 data['Type'] = translatedCtTypes.lending_income;
                 data['Trade-Group'] = 'Lapis';
                 data['Buy Currency'] = row['Cryptocurrency'];
                 data['Buy Amount'] = row['Amount'].replace('-','');
-                data['Buy Value in your Account Currency'] = await convertCurrency(row['FIAT value'].replace('-',''), row['FIAT currency'], currency, data['Date']);
+                data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
                 break;
             case 'Lapis DFI Bonus':
                 data['Type'] = translatedCtTypes.interest_income;
                 data['Trade-Group'] = 'Lapis';
                 data['Buy Currency'] = row['Cryptocurrency'];
                 data['Buy Amount'] = row['Amount'].replace('-','');
-                data['Buy Value in your Account Currency'] = await convertCurrency(row['FIAT value'].replace('-',''), row['FIAT currency'], currency, data['Date']);
+                data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
                 break;
             case 'Staking reward':
+            case 'Freezer Staking Bonus':
                 data['Type'] = translatedCtTypes.staking;
                 data['Trade-Group'] = 'Staking';
                 data['Buy Currency'] = row['Cryptocurrency'];
@@ -166,11 +124,10 @@ const generateCtRecordsFromCakeDataRow = async (row, lastHandledRecords, transla
                     data['Buy Amount'] = new Decimal(row['Amount'].replace('-','')).plus(lastHandledRecords[0]['Buy Amount']).toNumber();
                     if(lastHandledRecords[0]['Buy Value in your Account Currency']){
                         data['Buy Value in your Account Currency'] = new Decimal(row['FIAT value'].replace('-','')).plus(lastHandledRecords[0]['Buy Value in your Account Currency']).toNumber();
-                        data['Buy Value in your Account Currency'] = await convertCurrency(data['Buy Value in your Account Currency'], row['FIAT currency'], currency, data['Date']);
                     }
                 } else {
                     data['Buy Amount'] = row['Amount'].replace('-','');
-                    data['Buy Value in your Account Currency'] = await convertCurrency(row['FIAT value'].replace('-',''), row['FIAT currency'], currency, data['Date']);
+                    data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
                 }
                 break;
             case 'Unstake fee':
@@ -178,33 +135,33 @@ const generateCtRecordsFromCakeDataRow = async (row, lastHandledRecords, transla
                 data['Trade-Group'] = 'Staking';
                 data['Sell Currency'] = row['Cryptocurrency'];
                 data['Sell Amount'] = row['Amount'].replace('-','');
-                data['Sell Value in your Account Currency'] = await convertCurrency(row['FIAT value'].replace('-',''), row['FIAT currency'], currency, data['Date']);
+                data['Sell Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
                 break;
             case 'Bonus/Airdrop':
                 data['Type'] = translatedCtTypes.airdrop;
                 data['Trade-Group'] = 'Bonus/Airdrop';
                 data['Buy Currency'] = row['Cryptocurrency'];
                 data['Buy Amount'] = row['Amount'].replace('-','');
-                data['Buy Value in your Account Currency'] = await convertCurrency(row['FIAT value'].replace('-',''), row['FIAT currency'], currency, data['Date']);
+                data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
                 break;
             default:
                 let notHandledOperation = row['Operation'];
                 // Handle "Add liquidity AAA-BBB"
                 if(/^Add liquidity [A-Z]{3}-[A-Z]{3}$/.test(row['Operation'])){
-                    data['Type'] = noTaxOnLMOperations ? translatedCtTypes.expense_non_taxable : translatedCtTypes.other_expense;
+                    data['Type'] = noTaxOnLMTransferOperations ? translatedCtTypes.expense_non_taxable : translatedCtTypes.other_expense;
                     data['Trade-Group'] = 'Liquidity Mining';
                     data['Sell Currency'] = row['Cryptocurrency'];
                     data['Sell Amount'] = row['Amount'].replace('-','');
-                    data['Sell Value in your Account Currency'] = await convertCurrency(row['FIAT value'].replace('-',''), row['FIAT currency'], currency, data['Date']);
+                    data['Sell Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
                     notHandledOperation = null;
                 } 
                 // Handle "Remove liquidity AAA-BBB"
                 if(/^Remove liquidity [A-Z]{3}-[A-Z]{3}$/.test(row['Operation'])){
-                    data['Type'] = noTaxOnLMOperations ? translatedCtTypes.income_non_taxable : translatedCtTypes.other_income;
+                    data['Type'] = noTaxOnLMTransferOperations ? translatedCtTypes.income_non_taxable : translatedCtTypes.other_income;
                     data['Trade-Group'] = 'Liquidity Mining';
                     data['Buy Currency'] = row['Cryptocurrency'];
                     data['Buy Amount'] = row['Amount'].replace('-','');
-                    data['Buy Value in your Account Currency'] = await convertCurrency(row['FIAT value'].replace('-',''), row['FIAT currency'], currency, data['Date']);
+                    data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
                     notHandledOperation = null;
                 } 
                 // Handle "Liquidity mining reward AAA-BBB"
@@ -213,7 +170,7 @@ const generateCtRecordsFromCakeDataRow = async (row, lastHandledRecords, transla
                     data['Trade-Group'] = 'Liquidity Mining';
                     data['Buy Currency'] = row['Cryptocurrency'];
                     data['Buy Amount'] = row['Amount'].replace('-','');
-                    data['Buy Value in your Account Currency'] = await convertCurrency(row['FIAT value'].replace('-',''), row['FIAT currency'], currency, data['Date']);
+                    data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
                     notHandledOperation = null;
                 }
                 // Let us know which operation we are currently not supporting
@@ -237,20 +194,15 @@ const generateCtRecordsFromCakeDataRow = async (row, lastHandledRecords, transla
  * @param {*} cakeCsvPath 
  * @param {*} ctCsvPath 
  * @param {*} language 
- * @param {*} currency 
- * @param {*} noTaxOnLMOperations 
+ * @param {*} useCakeFiatValuation 
+ * @param {*} noTaxOnLMTransferOperations 
  */
-const processCsv = async (cakeCsvPath, ctCsvPath, language, currency, noTaxOnLMOperations) => {
+const processCsv = async (cakeCsvPath, ctCsvPath, language, useCakeFiatValuation, noTaxOnLMTransferOperations) => {
 
     // EN is the default language
     const normalizedLanguage = (language) ? language.toLowerCase() : 'en';
     // only "de" and "en" are supported atm
     const translatedCtTypes = (normalizedLanguage === 'de' || normalizedLanguage === 'en') ? ctType[language] : ctType['en'];
-
-    let convertToCurrency = null;
-    if(currency){
-        convertToCurrency = currency.toUpperCase();
-    }
 
     const cakeCsvFile = path.resolve(cakeCsvPath);
     const ctCsvFile = path.resolve(ctCsvPath);
@@ -280,7 +232,7 @@ const processCsv = async (cakeCsvPath, ctCsvPath, language, currency, noTaxOnLMO
             console.error('\n' + error);
         })
         .on('data', async row => {
-            lastHandledRecords = await generateCtRecordsFromCakeDataRow(row, lastHandledRecords, translatedCtTypes, convertToCurrency, noTaxOnLMOperations);
+            lastHandledRecords = await generateCtRecordsFromCakeDataRow(row, lastHandledRecords, translatedCtTypes, useCakeFiatValuation, noTaxOnLMTransferOperations);
 
             if (lastHandledRecords) {
                 // Delete last handled records from records

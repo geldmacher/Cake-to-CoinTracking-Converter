@@ -45,8 +45,8 @@ cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\ct-import-fi
 - `--cake-csv` - Path to Cake CSV.
 - `--ct-csv` - Path to CoinTracking CSV.
 - `--language` (optional) - Used language for CoinTracking import file. "DE" and "EN" are supported. Default is "EN".
-- `--currency` (optional, **experimental**) - Used currency for CoinTracking import file. Default is "USD".
-- `--lm-operations-not-taxable` (optional) - Adding to and removing from LM pools is a non-taxable event.
+- `--use-cake-fiat-valuation` (optional) - Use the FIAT transaction valuation from Cake CSV import instead of the valuation data from CoinTracking (Keep in mind that your CoinTracking account currency should match your exported transaction valutation currency from Cake).
+- `--lm-transfer-operations-not-taxable` (optional) - Handle adding to and removing from LM pools as a non-taxable event.
 
 ## Supported Cake operations
 
