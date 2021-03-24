@@ -56,6 +56,7 @@ cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\ct-import-fi
 - Lending reward
 - Lending DFI Bonus
 - Staking reward
+- Freezer staking bonus
 - Unstake fee
 - Bonus/Airdrop
 - Add liquidity XXX-YYY
