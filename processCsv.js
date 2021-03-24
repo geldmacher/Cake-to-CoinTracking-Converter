@@ -117,7 +117,6 @@ const generateCtRecordsFromCakeDataRow = (row, lastHandledRecords, translatedCtT
                     data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
                     break;
                 case 'Staking reward':
-                case 'Freezer Staking Bonus':
                     data['Type'] = translatedCtTypes.staking;
                     data['Trade-Group'] = 'Staking';
                     data['Buy Currency'] = row['Cryptocurrency'];
@@ -138,6 +137,13 @@ const generateCtRecordsFromCakeDataRow = (row, lastHandledRecords, translatedCtT
                         data['Buy Amount'] = row['Amount'].replace('-','');
                         data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
                     }
+                    break;
+                case 'Freezer staking bonus':
+                    data['Type'] = translatedCtTypes.staking;
+                    data['Trade-Group'] = 'Staking';
+                    data['Buy Currency'] = row['Cryptocurrency'];
+                    data['Buy Amount'] = row['Amount'].replace('-','');
+                    data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
                     break;
                 case 'Unstake fee':
                     data['Type'] = translatedCtTypes.other_fee;
