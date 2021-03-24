@@ -1,6 +1,6 @@
 {
   "name": "cake-to-cointracking-converter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "CLI script to translate Cake export data to a valid CoinTracking import",
   "main": "./processCsv.js",
   "scripts": {
