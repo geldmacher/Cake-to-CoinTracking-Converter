@@ -3,12 +3,12 @@ const path = require('path');
 const csv = require('csv-parser');
 const stringify = require('csv-stringify');
 const cliProgress = require('cli-progress');
-const { v5: uuidv5 } = require('uuid');
 const Decimal = require('decimal.js');
 
 // CoinTracking type fields need to be in the language of your CoinTracking UI
 const ctType = {
     de: {
+        trade: 'Trade',
         deposit: 'Einzahlung',
         withdrawal: 'Auszahlung',
         lending_income: 'Lending Einnahme',
@@ -24,6 +24,7 @@ const ctType = {
         other_expense: 'Sonstige Ausgabe'
     },
     en: {
+        trade: 'Trade',
         deposit: 'Deposit',
         withdrawal: 'Withdrawal',
         lending_income: 'Lending Income',
@@ -40,168 +41,150 @@ const ctType = {
     }
 };
 
-// Are there any skipped data rows?
-let skippedDataRows = false;
-
 /**
  * Translate Cake records to CoinTracking records
  * 
- * @param {*} row 
- * @param {*} lastHandledRecords 
+ * @param {*} row  
  * @param {*} translatedCtTypes 
- * @param {*} useCakeFiatValuation 
- * @param {*} noTaxOnLMTransferOperations 
+ * @param {*} useCakeFiatValuation  
  */
-const generateCtRecordsFromCakeDataRow = (row, lastHandledRecords, translatedCtTypes, useCakeFiatValuation, noTaxOnLMTransferOperations) => {
+const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCakeFiatValuation) => {
 
     const records = [];
+    const skippedRecords = [];
+    const lmRecords = [];
 
     try {
-        // Cake's CSV export is broken sometimes and exports dara rows without a valid "Operation" field
-        if(row['Operation'] === ''){
-            skippedDataRows = true;
-        } else {
-            const data = {
-                'Type': null,
-                'Buy Amount': null,
-                'Buy Currency': null,
-                'Sell Amount': null,
-                'Sell Currency': null,
-                'Fee': null,
-                'Fee Currency': null,
-                'Exchange': 'Cake',
-                'Trade-Group': null,
-                'Comment': row['Operation'],
-                'Date': new Date(row['Date']).toISOString(),
-                'Tx-ID': row['Reference'],
-                'Buy Value in your Account Currency': null,
-                'Sell Value in your Account Currency': null
-            };
+        const data = {
+            'Type': null,
+            'Buy Amount': null,
+            'Buy Currency': null,
+            'Sell Amount': null,
+            'Sell Currency': null,
+            'Fee': null,
+            'Fee Currency': null,
+            'Exchange': 'Cake',
+            'Trade-Group': null,
+            'Comment': row['Operation'],
+            'Date': new Date(row['Date']).toISOString(),
+            'Tx-ID': row['Reference'],
+            'Buy Value in your Account Currency': null,
+            'Sell Value in your Account Currency': null
+        };
 
-            switch(row['Operation']){
-                case 'Deposit':
-                    data['Type'] = translatedCtTypes.deposit;
-                    data['Trade-Group'] = 'Deposit';
-                    data['Buy Currency'] = row['Cryptocurrency'];
-                    data['Buy Amount'] = row['Amount'].replace('-','');
-                    data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
-                    break;
-                case 'Withdrawal': 
-                    data['Type'] = translatedCtTypes.withdrawal;
-                    data['Trade-Group'] = 'Withdrawal';
-                    data['Sell Currency'] = row['Cryptocurrency'];
-                    data['Sell Amount'] = row['Amount'].replace('-','');
-                    data['Sell Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
-                    break;
-                case 'Withdrawal fee':
-                    data['Type'] = translatedCtTypes.other_fee;
-                    data['Trade-Group'] = 'Withdrawal';
-                    data['Sell Currency'] = row['Cryptocurrency'];
-                    data['Sell Amount'] = row['Amount'].replace('-','');
-                    data['Sell Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
-                    break;
-                case 'Lapis reward':
-                case 'Lending reward':
-                    data['Type'] = translatedCtTypes.lending_income;
-                    data['Trade-Group'] = 'Lending';
-                    data['Buy Currency'] = row['Cryptocurrency'];
-                    data['Buy Amount'] = row['Amount'].replace('-','');
-                    data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
-                    break;
-                case 'Lapis DFI Bonus':
-                case 'Lending DFI Bonus':
-                    data['Type'] = translatedCtTypes.interest_income;
-                    data['Trade-Group'] = 'Lending';
-                    data['Buy Currency'] = row['Cryptocurrency'];
-                    data['Buy Amount'] = row['Amount'].replace('-','');
-                    data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
-                    break;
-                case 'Staking reward':
-                    data['Type'] = translatedCtTypes.staking;
-                    data['Trade-Group'] = 'Staking';
-                    data['Buy Currency'] = row['Cryptocurrency'];
-                    // Merge staking data rows by day at 24 o'clock
-                    // Otherwise there a way too much of them
-                    const date = new Date(row['Date']);
-                    const dateAtMidnight = new Date(date.setHours(24,0,0,0)).toISOString();
-                    data['Date'] = dateAtMidnight;
-                    // Generate own uuid to identify other records from same day
-                    // Unique namespace -> https://www.uuidgenerator.net/
-                    data['Tx-ID'] = uuidv5((data['Comment'] + '-' + data['Date']), '82f84ac6-c3c4-4de5-8d70-a7ce0aacde4f');
-                    if(lastHandledRecords && lastHandledRecords[0] && data['Tx-ID'] === lastHandledRecords[0]['Tx-ID']){
-                        data['Buy Amount'] = new Decimal(row['Amount'].replace('-','')).plus(lastHandledRecords[0]['Buy Amount']).toNumber();
-                        if(lastHandledRecords[0]['Buy Value in your Account Currency']){
-                            data['Buy Value in your Account Currency'] = new Decimal(row['FIAT value'].replace('-','')).plus(lastHandledRecords[0]['Buy Value in your Account Currency']).toNumber();
-                        }
-                    } else {
-                        data['Buy Amount'] = row['Amount'].replace('-','');
-                        data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
-                    }
-                    break;
-                case 'Freezer staking bonus':
-                    data['Type'] = translatedCtTypes.staking;
-                    data['Trade-Group'] = 'Staking';
-                    data['Buy Currency'] = row['Cryptocurrency'];
-                    data['Buy Amount'] = row['Amount'].replace('-','');
-                    data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
-                    break;
-                case 'Unstake fee':
-                    data['Type'] = translatedCtTypes.other_fee;
-                    data['Trade-Group'] = 'Staking';
-                    data['Sell Currency'] = row['Cryptocurrency'];
-                    data['Sell Amount'] = row['Amount'].replace('-','');
-                    data['Sell Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
-                    break;
-                case 'Bonus/Airdrop':
-                    data['Type'] = translatedCtTypes.airdrop;
-                    data['Trade-Group'] = 'Bonus/Airdrop';
-                    data['Buy Currency'] = row['Cryptocurrency'];
-                    data['Buy Amount'] = row['Amount'].replace('-','');
-                    data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
-                    break;
-                default:
-                    let notHandledOperation = row['Operation'];
-                    // Handle "Add liquidity AAA-BBB"
-                    if(/^Add liquidity [A-Z]{3}-[A-Z]{3}$/.test(row['Operation'])){
-                        data['Type'] = noTaxOnLMTransferOperations ? translatedCtTypes.expense_non_taxable : translatedCtTypes.other_expense;
-                        data['Trade-Group'] = 'Liquidity Mining';
-                        data['Sell Currency'] = row['Cryptocurrency'];
-                        data['Sell Amount'] = row['Amount'].replace('-','');
-                        data['Sell Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
-                        notHandledOperation = null;
-                    } 
-                    // Handle "Remove liquidity AAA-BBB"
-                    if(/^Remove liquidity [A-Z]{3}-[A-Z]{3}$/.test(row['Operation'])){
-                        data['Type'] = noTaxOnLMTransferOperations ? translatedCtTypes.income_non_taxable : translatedCtTypes.other_income;
-                        data['Trade-Group'] = 'Liquidity Mining';
-                        data['Buy Currency'] = row['Cryptocurrency'];
-                        data['Buy Amount'] = row['Amount'].replace('-','');
-                        data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
-                        notHandledOperation = null;
-                    } 
-                    // Handle "Liquidity mining reward AAA-BBB"
-                    if(/^Liquidity mining reward [A-Z]{3}-[A-Z]{3}$/.test(row['Operation'])){
-                        data['Type'] = translatedCtTypes.income;
-                        data['Trade-Group'] = 'Liquidity Mining';
-                        data['Buy Currency'] = row['Cryptocurrency'];
-                        data['Buy Amount'] = row['Amount'].replace('-','');
-                        data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
-                        notHandledOperation = null;
-                    }
-                    // Let us know which operation we are currently not supporting
-                    if(notHandledOperation){
-                        console.info('\n' + 'Not able to handle Cake\'s "' + notHandledOperation + '" operation atm.');
-                    }
+        switch(row['Operation']){
+            case 'Liquidity mining pool trade':
+                data['Type'] = translatedCtTypes.trade;
+                data['Trade-Group'] = 'Liquidity Mining';
+                data['Buy Currency'] = row['Buy Coin/Asset'];
+                data['Buy Amount'] = row['Buy Amount'].replace('-','');
+                data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['Buy FIAT value'].replace('-','') : null;
+                data['Sell Currency'] = row['Sell Coin/Asset'];
+                data['Sell Amount'] = row['Sell Amount'].replace('-','');
+                data['Sell Value in your Account Currency'] = useCakeFiatValuation ? row['Sell FIAT value'].replace('-','') : null;
                 break;
-            }
-        
+            case 'Deposit':
+                data['Type'] = translatedCtTypes.deposit;
+                data['Trade-Group'] = 'Deposit';
+                data['Buy Currency'] = row['Coin/Asset'];
+                data['Buy Amount'] = row['Amount'].replace('-','');
+                data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
+                break;
+            case 'Withdrawal': 
+                data['Type'] = translatedCtTypes.withdrawal;
+                data['Trade-Group'] = 'Withdrawal';
+                data['Sell Currency'] = row['Coin/Asset'];
+                data['Sell Amount'] = row['Amount'].replace('-','');
+                data['Sell Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
+                break;
+            case 'Withdrawal fee':
+                data['Type'] = translatedCtTypes.other_fee;
+                data['Trade-Group'] = 'Withdrawal';
+                data['Sell Currency'] = row['Coin/Asset'];
+                data['Sell Amount'] = row['Amount'].replace('-','');
+                data['Sell Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
+                break;
+            case 'Lapis reward':
+            case 'Lending reward':
+                data['Type'] = translatedCtTypes.lending_income;
+                data['Trade-Group'] = 'Lending';
+                data['Buy Currency'] = row['Coin/Asset'];
+                data['Buy Amount'] = row['Amount'].replace('-','');
+                data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
+                break;
+            case 'Lapis DFI Bonus':
+            case 'Lending DFI Bonus':
+                data['Type'] = translatedCtTypes.interest_income;
+                data['Trade-Group'] = 'Lending';
+                data['Buy Currency'] = row['Coin/Asset'];
+                data['Buy Amount'] = row['Amount'].replace('-','');
+                data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
+                break;
+            case 'Staking reward':
+                data['Type'] = translatedCtTypes.staking;
+                data['Trade-Group'] = 'Staking';
+                data['Buy Currency'] = row['Coin/Asset'];
+                data['Buy Amount'] = row['Amount'].replace('-','');
+                data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
+            case 'Freezer staking bonus':
+                data['Type'] = translatedCtTypes.staking;
+                data['Trade-Group'] = 'Staking';
+                data['Buy Currency'] = row['Coin/Asset'];
+                data['Buy Amount'] = row['Amount'].replace('-','');
+                data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
+                break;
+            case 'Unstake fee':
+                data['Type'] = translatedCtTypes.other_fee;
+                data['Trade-Group'] = 'Staking';
+                data['Sell Currency'] = row['Coin/Asset'];
+                data['Sell Amount'] = row['Amount'].replace('-','');
+                data['Sell Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
+                break;
+            case 'Bonus/Airdrop':
+                data['Type'] = translatedCtTypes.airdrop;
+                data['Trade-Group'] = 'Bonus/Airdrop';
+                data['Buy Currency'] = row['Coin/Asset'];
+                data['Buy Amount'] = row['Amount'].replace('-','');
+                data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
+                break;
+            default:
+                let notHandledOperation = row['Operation'];
+                // Preserve LM related rows which are related to each other and transfer their data to another handling mechanism
+                if(
+                    row['Operation'] === 'Added liquidity' 
+                    || row['Operation'] === 'Removed liquidity' 
+                    || /^Add liquidity [A-Z]{3}-[A-Z]{3}$/.test(row['Operation']) 
+                    || /^Remove liquidity [A-Z]{3}-[A-Z]{3}$/.test(row['Operation'])
+                ){
+                    lmRecords.push(row);
+                    notHandledOperation = null;
+                }
+                // Handle "Liquidity mining reward AAA-BBB"
+                if(/^Liquidity mining reward [A-Z]{3}-[A-Z]{3}$/.test(row['Operation'])){
+                    data['Type'] = translatedCtTypes.income;
+                    data['Trade-Group'] = 'Liquidity Mining';
+                    data['Buy Currency'] = row['Coin/Asset'];
+                    data['Buy Amount'] = row['Amount'].replace('-','');
+                    data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
+                    notHandledOperation = null;
+                }
+                // Log operations which are currently not supported
+                if(notHandledOperation){
+                    skippedRecords.push(row);
+                    console.info('\n' + 'Not able to handle Cake\'s "' + notHandledOperation + '" operation atm.');
+                }
+            break;
+        }
+
+        if(data['Type'] && data['Type'].length > 0){
             records.push(data);
         }
     } catch(err) {
+        skippedRecords.push(row);
         console.error('\n' + err);
         process.exit();
     }
-    return records;
+    return [records, skippedRecords, lmRecords];
 }
 
 /**
@@ -211,9 +194,8 @@ const generateCtRecordsFromCakeDataRow = (row, lastHandledRecords, translatedCtT
  * @param {*} ctCsvPath 
  * @param {*} language 
  * @param {*} useCakeFiatValuation 
- * @param {*} noTaxOnLMTransferOperations 
  */
-const processCsv = (cakeCsvPath, ctCsvPath, language, useCakeFiatValuation, noTaxOnLMTransferOperations) => {
+const processCsv = (cakeCsvPath, ctCsvPath, language, useCakeFiatValuation) => {
 
     // EN is the default language
     const normalizedLanguage = (language.length > 0) ? language.toLowerCase() : 'en';
@@ -233,7 +215,8 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCakeFiatValuation, noTa
     const cakeCsvStream = fs.createReadStream(cakeCsvFile);
 
     let records = [];
-    let lastHandledRecords;
+    let skippedRecords = [];
+    let lmRecords = [];
 
     progressBar.start(1, 0);
 
@@ -248,23 +231,25 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCakeFiatValuation, noTa
             console.error('\n' + error);
         })
         .on('data', row => {
-            lastHandledRecords = generateCtRecordsFromCakeDataRow(row, lastHandledRecords, translatedCtTypes, useCakeFiatValuation, noTaxOnLMTransferOperations);
-
-            if (lastHandledRecords) {
-                // Delete last handled records from records
-                records = records.filter(record => {
-                    if(lastHandledRecords[0] && record['Tx-ID'] === lastHandledRecords[0]['Tx-ID']){
-                        return false;
-                    } 
-                    return true;
-                });
-                records = [...records, ...lastHandledRecords];
-                progressBar.setTotal(records.length);
-                progressBar.increment(lastHandledRecords.length);
+            handledRecords = generateCtRecordsFromCakeDataRow(row, translatedCtTypes, useCakeFiatValuation);
+            progressBar.setTotal(records.length + skippedRecords.length + lmRecords.length);
+            // Normal records
+            if (handledRecords[0].length > 0) {
+                records = [...records, ...handledRecords[0]];
+                progressBar.increment(handledRecords[0].length);
                 progressBar.updateETA();
-            } else {
-                progressBar.stop();
-                console.info('\n' + 'No Cake records found');
+            } 
+            // Skipped records
+            if (handledRecords[1].length > 0) {
+                skippedRecords = [...skippedRecords, ...handledRecords[1]];
+                progressBar.increment(handledRecords[1].length);
+                progressBar.updateETA();
+            }
+            // LM records
+            if (handledRecords[2].length > 0) {
+                lmRecords = [...lmRecords, ...handledRecords[2]];
+                progressBar.increment(handledRecords[2].length);
+                progressBar.updateETA();
             }
         })
         .on('error', error => {
@@ -272,6 +257,73 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCakeFiatValuation, noTa
             progressBar.stop();
         })
         .on('end', () => {
+            // Any skipped records?
+            if(skippedRecords.length > 0){
+                console.info('\n' + 'Some data rows where skipped.');
+            }
+            // Handle LM records
+            if(lmRecords.length > 0){
+                const sortedLmRecords = new Map();
+                lmRecords.forEach(lmRecord => {
+                    if(lmRecord['Related reference ID'].length <= 0){
+                        sortedLmRecords.set(lmRecord['Reference'], {
+                            '_refs': new Set(),
+                            ...sortedLmRecords.get(lmRecord['Reference']),
+                            ...lmRecord
+                        });
+                    } else {
+                        if(sortedLmRecords.has(lmRecord['Related reference ID'])){
+                            const sortedLmRecord = sortedLmRecords.get(lmRecord['Related reference ID']);
+                            sortedLmRecord['_refs'].add(lmRecord);
+                            sortedLmRecords.set(lmRecord['Related reference ID'], sortedLmRecord);
+                        } else {
+                            sortedLmRecords.set(lmRecord['Related reference ID'], {
+                                '_refs': new Set([lmRecord]),
+                            });
+                        }
+                    }
+                });
+                
+                const augmentedLmRecords = [];
+                sortedLmRecords.forEach(sortedLmRecord => {
+                    sortedLmRecord._refs.forEach(sortedLmRecordRef => {
+                        const augmentedLmRecord = {
+                            'Date': sortedLmRecord['Date'],
+                            'Operation': 'Liquidity mining pool trade'
+                        };
+    
+                        switch(sortedLmRecord['Operation']){
+                            case 'Added liquidity':
+                                augmentedLmRecord['Reference'] = sortedLmRecordRef['Reference'];
+                                augmentedLmRecord['Buy Amount'] = new Decimal(sortedLmRecord['Amount']).dividedBy(2).toString();
+                                augmentedLmRecord['Buy Coin/Asset'] = sortedLmRecord['Coin/Asset'];
+                                augmentedLmRecord['Buy FIAT value'] = sortedLmRecordRef['FIAT value'];
+                                augmentedLmRecord['Sell Amount'] = sortedLmRecordRef['Amount'];
+                                augmentedLmRecord['Sell Coin/Asset'] = sortedLmRecordRef['Coin/Asset'];
+                                augmentedLmRecord['Sell FIAT value'] = sortedLmRecordRef['FIAT value'];
+                                break;
+                            case 'Removed liquidity':
+                                augmentedLmRecord['Reference'] = sortedLmRecordRef['Reference'];
+                                augmentedLmRecord['Buy Amount'] = sortedLmRecordRef['Amount'];
+                                augmentedLmRecord['Buy Coin/Asset'] = sortedLmRecordRef['Coin/Asset'];
+                                augmentedLmRecord['Buy FIAT value'] = sortedLmRecordRef['FIAT value'];
+                                augmentedLmRecord['Sell Amount'] = new Decimal(sortedLmRecord['Amount']).dividedBy(2).toString();
+                                augmentedLmRecord['Sell Coin/Asset'] = sortedLmRecord['Coin/Asset'];
+                                augmentedLmRecord['Sell FIAT value'] = sortedLmRecordRef['FIAT value'];
+                                break;
+                        }
+                        augmentedLmRecords.push(augmentedLmRecord);
+                    });
+                });
+
+                augmentedLmRecords.forEach(augmentedLmRecord => {
+                    handledRecords = generateCtRecordsFromCakeDataRow(augmentedLmRecord, translatedCtTypes, useCakeFiatValuation);
+                    if (handledRecords[0].length > 0) {
+                        records = [...records, ...handledRecords[0]];
+                    } 
+                });
+            }
+            // Build CoinTracking CSV file
             stringify(records, {
                 header: true,
                 quoted: true,
@@ -287,10 +339,6 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCakeFiatValuation, noTa
                             if (error) {
                                 console.error('\n' + error);
                             } else {
-                                // Any skipped data rows?
-                                if(skippedDataRows){
-                                    console.info('\n' + 'Some data rows where skipped because the "Operation" field in Cake\'s CSV export was empty.');
-                                }
                                 console.info('\n' + 'Done! Wrote Cake data to CoinTracking file.');
                             }
                         });
