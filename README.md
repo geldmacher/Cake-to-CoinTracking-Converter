@@ -2,13 +2,16 @@
 
 CLI script to translate [Cake](https://pool.cakedefi.com/#?ref=401824) export data to a valid [CoinTracking](https://cointracking.info?ref=G905622) import.
 
-**IMPORTANT**: Make a backup of your trades before you import new data via this script! \
+**IMPORTANT**: Make a backup of your trades before you import new data via this script!
 **EVEN MORE IMPORTANT**: This is no tax advice! The way this script imports data is potentially wrong.
 
 ## Features
 
-- Supports german and english CoinTracking import. English is used by default.
-- Optional: Uses Cake's FIAT valuation for each transaction in your chosen export currency inestead of the CoinTracking valuation data.
+- **Supports german and english CoinTracking import**
+English is used by default.
+- **Uses Cake's FIAT valuation for each transaction in your chosen export currency inestead of the CoinTracking valuation data**
+Keep in mind that your CoinTracking account currency should match your exported transaction valutation currency from Cake.
+This feature can be disabled via `--use-cointracking-fiat-valuation`. The CoinTracking data is than used.
 
 ## Installation
 
@@ -32,10 +35,10 @@ cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\cointracking
 
 ## Options
 
-- `--cake-csv` - Path to Cake CSV
-- `--ct-csv` - Path to CoinTracking CSV
-- `--language` (optional) - Used language for CoinTracking import file. "DE" and "EN" are supported. Default is "EN"
-- `--use-cake-fiat-valuation` (optional) - Use the FIAT transaction valuation from Cake CSV import instead of the valuation data from CoinTracking (Keep in mind that your CoinTracking account currency should match your exported transaction valutation currency from Cake)
+- `--cake-csv` - Path to Cake CSV.
+- `--ct-csv` - Path to CoinTracking CSV. Creates one, if is is not existing.
+- `--language` (optional) - Used language for CoinTracking import file. "DE" and "EN" are supported. Default is "EN".
+- `--use-cointracking-fiat-valuation` (optional) - Use the FIAT transaction valuation from CoinTracking instead of the valuation data from Cake.
 
 ## Supported Cake operations
 

@@ -46,9 +46,9 @@ const ctType = {
  * 
  * @param {*} row  
  * @param {*} translatedCtTypes 
- * @param {*} useCakeFiatValuation  
+ * @param {*} useCtFiatValuation  
  */
-const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCakeFiatValuation) => {
+const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValuation) => {
 
     const records = [];
     const skippedRecords = [];
@@ -78,31 +78,31 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCakeFiatVal
                 data['Trade-Group'] = 'Liquidity Mining';
                 data['Buy Currency'] = row['Buy Coin/Asset'];
                 data['Buy Amount'] = row['Buy Amount'].replace('-','');
-                data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['Buy FIAT value'].replace('-','') : null;
+                data['Buy Value in your Account Currency'] = useCtFiatValuation ? row['Buy FIAT value'].replace('-','') : null;
                 data['Sell Currency'] = row['Sell Coin/Asset'];
                 data['Sell Amount'] = row['Sell Amount'].replace('-','');
-                data['Sell Value in your Account Currency'] = useCakeFiatValuation ? row['Sell FIAT value'].replace('-','') : null;
+                data['Sell Value in your Account Currency'] = useCtFiatValuation ? row['Sell FIAT value'].replace('-','') : null;
                 break;
             case 'Deposit':
                 data['Type'] = translatedCtTypes.deposit;
                 data['Trade-Group'] = 'Deposit';
                 data['Buy Currency'] = row['Coin/Asset'];
                 data['Buy Amount'] = row['Amount'].replace('-','');
-                data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
+                data['Buy Value in your Account Currency'] = useCtFiatValuation ? null : row['FIAT value'].replace('-','');
                 break;
             case 'Withdrawal': 
                 data['Type'] = translatedCtTypes.withdrawal;
                 data['Trade-Group'] = 'Withdrawal';
                 data['Sell Currency'] = row['Coin/Asset'];
                 data['Sell Amount'] = row['Amount'].replace('-','');
-                data['Sell Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
+                data['Sell Value in your Account Currency'] = useCtFiatValuation ? null : row['FIAT value'].replace('-','');
                 break;
             case 'Withdrawal fee':
                 data['Type'] = translatedCtTypes.other_fee;
                 data['Trade-Group'] = 'Withdrawal';
                 data['Sell Currency'] = row['Coin/Asset'];
                 data['Sell Amount'] = row['Amount'].replace('-','');
-                data['Sell Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
+                data['Sell Value in your Account Currency'] = useCtFiatValuation ? null : row['FIAT value'].replace('-','');
                 break;
             case 'Lapis reward':
             case 'Lending reward':
@@ -110,7 +110,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCakeFiatVal
                 data['Trade-Group'] = 'Lending';
                 data['Buy Currency'] = row['Coin/Asset'];
                 data['Buy Amount'] = row['Amount'].replace('-','');
-                data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
+                data['Buy Value in your Account Currency'] = useCtFiatValuation ? null : row['FIAT value'].replace('-','');
                 break;
             case 'Lapis DFI Bonus':
             case 'Lending DFI Bonus':
@@ -118,34 +118,34 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCakeFiatVal
                 data['Trade-Group'] = 'Lending';
                 data['Buy Currency'] = row['Coin/Asset'];
                 data['Buy Amount'] = row['Amount'].replace('-','');
-                data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
+                data['Buy Value in your Account Currency'] = useCtFiatValuation ? null : row['FIAT value'].replace('-','');
                 break;
             case 'Staking reward':
                 data['Type'] = translatedCtTypes.staking;
                 data['Trade-Group'] = 'Staking';
                 data['Buy Currency'] = row['Coin/Asset'];
                 data['Buy Amount'] = row['Amount'].replace('-','');
-                data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
+                data['Buy Value in your Account Currency'] = useCtFiatValuation ? null : row['FIAT value'].replace('-','');
             case 'Freezer staking bonus':
                 data['Type'] = translatedCtTypes.staking;
                 data['Trade-Group'] = 'Staking';
                 data['Buy Currency'] = row['Coin/Asset'];
                 data['Buy Amount'] = row['Amount'].replace('-','');
-                data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
+                data['Buy Value in your Account Currency'] = useCtFiatValuation ? null : row['FIAT value'].replace('-','');
                 break;
             case 'Unstake fee':
                 data['Type'] = translatedCtTypes.other_fee;
                 data['Trade-Group'] = 'Staking';
                 data['Sell Currency'] = row['Coin/Asset'];
                 data['Sell Amount'] = row['Amount'].replace('-','');
-                data['Sell Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
+                data['Sell Value in your Account Currency'] = useCtFiatValuation ? null : row['FIAT value'].replace('-','');
                 break;
             case 'Bonus/Airdrop':
                 data['Type'] = translatedCtTypes.airdrop;
                 data['Trade-Group'] = 'Bonus/Airdrop';
                 data['Buy Currency'] = row['Coin/Asset'];
                 data['Buy Amount'] = row['Amount'].replace('-','');
-                data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
+                data['Buy Value in your Account Currency'] = useCtFiatValuation ? null : row['FIAT value'].replace('-','');
                 break;
             default:
                 let notHandledOperation = row['Operation'];
@@ -165,7 +165,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCakeFiatVal
                     data['Trade-Group'] = 'Liquidity Mining';
                     data['Buy Currency'] = row['Coin/Asset'];
                     data['Buy Amount'] = row['Amount'].replace('-','');
-                    data['Buy Value in your Account Currency'] = useCakeFiatValuation ? row['FIAT value'].replace('-','') : null;
+                    data['Buy Value in your Account Currency'] = useCtFiatValuation ? null : row['FIAT value'].replace('-','');
                     notHandledOperation = null;
                 }
                 // Log operations which are currently not supported
@@ -193,9 +193,9 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCakeFiatVal
  * @param {*} cakeCsvPath 
  * @param {*} ctCsvPath 
  * @param {*} language 
- * @param {*} useCakeFiatValuation 
+ * @param {*} useCtFiatValuation 
  */
-const processCsv = (cakeCsvPath, ctCsvPath, language, useCakeFiatValuation) => {
+const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation) => {
 
     // EN is the default language
     const normalizedLanguage = (language.length > 0) ? language.toLowerCase() : 'en';
@@ -231,7 +231,7 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCakeFiatValuation) => {
             console.error('\n' + error);
         })
         .on('data', row => {
-            handledRecords = generateCtRecordsFromCakeDataRow(row, translatedCtTypes, useCakeFiatValuation);
+            handledRecords = generateCtRecordsFromCakeDataRow(row, translatedCtTypes, useCtFiatValuation);
             progressBar.setTotal(records.length + skippedRecords.length + lmRecords.length);
             // Normal records
             if (handledRecords[0].length > 0) {
@@ -317,7 +317,7 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCakeFiatValuation) => {
                 });
 
                 augmentedLmRecords.forEach(augmentedLmRecord => {
-                    handledRecords = generateCtRecordsFromCakeDataRow(augmentedLmRecord, translatedCtTypes, useCakeFiatValuation);
+                    handledRecords = generateCtRecordsFromCakeDataRow(augmentedLmRecord, translatedCtTypes, useCtFiatValuation);
                     if (handledRecords[0].length > 0) {
                         records = [...records, ...handledRecords[0]];
                     } 
