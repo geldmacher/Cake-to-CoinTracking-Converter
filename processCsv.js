@@ -4,6 +4,7 @@ const csv = require('csv-parser');
 const stringify = require('csv-stringify');
 const cliProgress = require('cli-progress');
 const Decimal = require('decimal.js');
+const { v5: uuidv5 } = require('uuid');
 
 // CoinTracking type fields need to be in the language of your CoinTracking UI
 const ctType = {
@@ -194,8 +195,9 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
  * @param {*} ctCsvPath 
  * @param {*} language 
  * @param {*} useCtFiatValuation 
+ * @param {*} consolidateStakingData 
  */
-const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation) => {
+const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consolidateStakingData) => {
 
     // EN is the default language
     const normalizedLanguage = (language.length > 0) ? language.toLowerCase() : 'en';
@@ -232,35 +234,69 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation) => {
         })
         .on('data', row => {
             handledRecords = generateCtRecordsFromCakeDataRow(row, translatedCtTypes, useCtFiatValuation);
-            progressBar.setTotal(records.length + skippedRecords.length + lmRecords.length);
+
             // Normal records
             if (handledRecords[0].length > 0) {
                 records = [...records, ...handledRecords[0]];
                 progressBar.increment(handledRecords[0].length);
-                progressBar.updateETA();
             } 
             // Skipped records
             if (handledRecords[1].length > 0) {
                 skippedRecords = [...skippedRecords, ...handledRecords[1]];
                 progressBar.increment(handledRecords[1].length);
-                progressBar.updateETA();
             }
             // LM records
             if (handledRecords[2].length > 0) {
                 lmRecords = [...lmRecords, ...handledRecords[2]];
                 progressBar.increment(handledRecords[2].length);
-                progressBar.updateETA();
             }
+
+            progressBar.setTotal(records.length + skippedRecords.length + lmRecords.length);
+            progressBar.updateETA();
         })
         .on('error', error => {
             console.error('\n' + error);
             progressBar.stop();
         })
         .on('end', () => {
+
             // Any skipped records?
             if(skippedRecords.length > 0){
                 console.info('\n' + 'Some data rows where skipped.');
             }
+
+            // Consolidate staking data rows by day at midnight
+            if(consolidateStakingData && records.length > 0){
+
+                const consolidatedRecords = new Map();
+
+                records.forEach(record => {
+                    if(record['Type'] === translatedCtTypes.staking){
+                        const date = new Date(record['Date']);
+                        const dateAtMidnight = new Date(date.setHours(24,0,0,0)).toISOString();
+                        record['Date'] = dateAtMidnight;
+                        record['Comment'] = record['Comment'] + ' (Consolidated)';
+                        // Generate own uuid to identify other records from same day
+                        // Unique namespace -> https://www.uuidgenerator.net/
+                        record['Tx-ID'] = uuidv5((record['Comment'] + '-' + record['Date']), '82f84ac6-c3c4-4de5-8d70-a7ce0aacde4f');
+                        if(consolidatedRecords.has(record['Tx-ID'])){
+                            const consolidatedRecord = consolidatedRecords.get(record['Tx-ID']);
+                            record['Buy Amount'] = new Decimal(record['Buy Amount'].replace('-','')).plus(consolidatedRecord['Buy Amount'].replace('-','')).toNumber();
+                            if(!useCtFiatValuation){
+                                record['Buy Value in your Account Currency'] = new Decimal(record['Buy Value in your Account Currency'].replace('-','')).plus(consolidatedRecord['Buy Value in your Account Currency'].replace('-','')).toNumber();
+                            }
+                            consolidatedRecords.set(record['Tx-ID'], record);
+                        } else { 
+                            consolidatedRecords.set(record['Tx-ID'], record);
+                        }
+                        // Remove original record from records
+                        records = records.filter(originalRecord => originalRecord['Tx-ID'] !== record['Tx-ID']);
+                    }
+                });
+
+                records = [...records, ...consolidatedRecords.values()];
+            }
+
             // Handle LM records
             if(lmRecords.length > 0){
                 const sortedLmRecords = new Map();
@@ -323,6 +359,7 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation) => {
                     } 
                 });
             }
+
             // Build CoinTracking CSV file
             stringify(records, {
                 header: true,

@@ -12,6 +12,9 @@ English is used by default.
 - **Uses Cake's FIAT valuation for each transaction in your chosen export currency inestead of the CoinTracking valuation data**
 Keep in mind that your CoinTracking account currency should match your exported transaction valutation currency from Cake.
 This feature can be disabled via `--use-cointracking-fiat-valuation`. The CoinTracking data is than used.
+- **Consolidate data from staking operations on a daily basis at midnight** (optional)
+This can drastically reduce the import amount of data rows for CoinTracking.
+You can switch this on via  `--consolidate-staking-data`.
 
 ## Installation
 
@@ -38,6 +41,7 @@ cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\cointracking
 - `--cake-csv` - Path to Cake CSV.
 - `--ct-csv` - Path to CoinTracking CSV. Creates one, if is is not existing.
 - `--language` (optional) - Used language for CoinTracking import file. "DE" and "EN" are supported. Default is "EN".
+- `--consolidate-staking-data` (optional) - Consolidate data from staking operations on a daily basis at midnight.
 - `--use-cointracking-fiat-valuation` (optional) - Use the FIAT transaction valuation from CoinTracking instead of the valuation data from Cake.
 
 ## Supported Cake operations
