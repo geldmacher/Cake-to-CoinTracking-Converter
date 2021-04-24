@@ -14,21 +14,21 @@ CLI script to translate [Cake](https://pool.cakedefi.com/#?ref=401824) export da
 
 [Node.js](https://nodejs.org/) is required to run this script.
 
-Install via npm:
+Install via npm (Bundled with Node.js):
 ```shell
 npm install cake-to-cointracking-converter
 ```
 
 ## Usage
 
-Get your [Cake export CSV](https://app.cakedefi.com/transactions) for each coin and generate a CoinTracking import CSV for each.
+1. Get your [Cake export CSV](https://app.cakedefi.com/transactions) for all coins and generate a CoinTracking import CSV via this shell command:
 
-Via shell:
-```shell
-cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\ct-import-file.csv" --language "DE"
+2. Run this script via shell: 
+```shell 
+cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\cointracking-import-file.csv" --language "DE"
 ```
 
-[Import](https://cointracking.info/import/import_csv/) the generated CoinTracking CSV. Just select your file, check your imports on the next page and import your data if everthing is fine.
+3. [Import](https://cointracking.info/import/import_csv/) the generated CoinTracking CSV. Just select your file, check your imports on the next page and import your data if everthing is fine.
 
 ## Options
 
