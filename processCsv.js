@@ -154,14 +154,14 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 if(
                     row['Operation'] === 'Added liquidity' 
                     || row['Operation'] === 'Removed liquidity' 
-                    || /^Add liquidity [A-Z]{3}-[A-Z]{3}$/.test(row['Operation']) 
-                    || /^Remove liquidity [A-Z]{3}-[A-Z]{3}$/.test(row['Operation'])
+                    || /^Add liquidity [A-Z]{3,4}-[A-Z]{3}$/.test(row['Operation']) 
+                    || /^Remove liquidity [A-Z]{3,4}-[A-Z]{3}$/.test(row['Operation'])
                 ){
                     lmRecords.push(row);
                     notHandledOperation = null;
                 }
-                // Handle "Liquidity mining reward AAA-BBB"
-                if(/^Liquidity mining reward [A-Z]{3}-[A-Z]{3}$/.test(row['Operation'])){
+                // Handle "Liquidity mining reward AAA(A)-BBB"
+                if(/^Liquidity mining reward [A-Z]{3,4}-[A-Z]{3}$/.test(row['Operation'])){
                     data['Type'] = translatedCtTypes.income;
                     data['Trade-Group'] = 'Liquidity Mining';
                     data['Buy Currency'] = row['Coin/Asset'];
