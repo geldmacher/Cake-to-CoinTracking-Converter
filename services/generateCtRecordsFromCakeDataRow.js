@@ -1,3 +1,4 @@
+const Decimal = require('decimal.js');
 
 /**
  * Translate Cake records to CoinTracking records
@@ -6,7 +7,7 @@
  * @param {*} translatedCtTypes 
  * @param {*} useCtFiatValuation  
  */
- const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValuation) => {
+const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValuation) => {
 
     const records = [];
     const skippedRecords = [];
