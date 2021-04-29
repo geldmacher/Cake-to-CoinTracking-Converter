@@ -14,7 +14,7 @@ const argv = yargs(hideBin(process.argv))
     .boolean('consolidate-staking-data')
     .describe('consolidate-staking-data', 'Consolidate data from staking operations on a daily basis at midnight.')
     .boolean('use-cointracking-fiat-valuation')
-    .describe('use-cake-fiat-valuation', 'Use the FIAT transaction valuation from CoinTracking instead of the valuation data from Cake.')
+    .describe('use-cointracking-fiat-valuation', 'Use the FIAT transaction valuation from CoinTracking instead of the valuation data from Cake.')
     .argv;
 
 processCsv(argv['cake-csv'], argv['ct-csv'], argv['language'], argv['use-cointracking-fiat-valuation'], argv['consolidate-staking-data']);
