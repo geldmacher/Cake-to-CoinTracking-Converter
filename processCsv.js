@@ -7,7 +7,7 @@ const cliProgress = require('cli-progress');
 const { consolidateData } = require('./services/consolidateData');
 const { augmentLmRecords } = require('./services/augmentLmRecords');
 const { generateCtRecordsFromCakeDataRow } = require('./services/generateCtRecordsFromCakeDataRow');
-const { generateImportResultOutput } = require('./services/generateImportResultOutput');
+const { generateHoldingsOverview } = require('./services/generateHoldingsOverview');
 
 // CoinTracking type fields need to be in the language of your CoinTracking UI
 const ctType = {
@@ -138,8 +138,8 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
                 });
             }
 
-            // Output import stats
-            const statsOutput = generateImportResultOutput(records);
+            // Output holdings
+            const holdings = generateHoldingsOverview(records);
 
             // Build CoinTracking CSV file
             stringify(records, {
@@ -157,7 +157,7 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
                             if (error) {
                                 console.error('\n' + error);
                             } else {
-                                console.log('\n' + statsOutput);
+                                console.log('\n' + holdings);
                                 console.info('\n' + 'Done! Wrote Cake data to CoinTracking file.');
                             }
                         });

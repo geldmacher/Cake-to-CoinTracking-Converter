@@ -1,6 +1,11 @@
 const Decimal = require('decimal.js');
 const { v5: uuidv5 } = require('uuid');
 
+Decimal.set({ 
+    precision: 100,
+    minE: -500
+});
+
 /**
  * Consolidate data rows
  * 
@@ -24,9 +29,9 @@ const consolidateData = (records, translatedCtTypes, useCtFiatValuation) => {
             stakingRecord['Tx-ID'] = uuidv5((stakingRecord['Comment'] + '-' + stakingRecord['Date'] + '-' + stakingRecord['Buy Currency']), '82f84ac6-c3c4-4de5-8d70-a7ce0aacde4f');
             if(consolidatedRecords.has(stakingRecord['Tx-ID'])){
                 const consolidatedRecord = consolidatedRecords.get(stakingRecord['Tx-ID']);
-                stakingRecord['Buy Amount'] = new Decimal(record['Buy Amount']).plus(consolidatedRecord['Buy Amount']).toNumber();
+                stakingRecord['Buy Amount'] = new Decimal(record['Buy Amount']).plus(consolidatedRecord['Buy Amount']).toString();
                 if(!useCtFiatValuation){
-                    stakingRecord['Buy Value in your Account Currency'] = new Decimal(record['Buy Value in your Account Currency']).plus(consolidatedRecord['Buy Value in your Account Currency']).toNumber();
+                    stakingRecord['Buy Value in your Account Currency'] = new Decimal(record['Buy Value in your Account Currency']).plus(consolidatedRecord['Buy Value in your Account Currency']).toString();
                 }
                 consolidatedRecords.set(stakingRecord['Tx-ID'], stakingRecord);
             } else { 
