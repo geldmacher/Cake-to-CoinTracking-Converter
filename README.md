@@ -12,9 +12,11 @@ English is used by default.
 - **Uses Cake's FIAT valuation for each transaction in your chosen export currency inestead of the CoinTracking valuation data**
 Keep in mind that your CoinTracking account currency should match your exported transaction valutation currency from Cake.
 This feature can be disabled via `--use-cointracking-fiat-valuation`. The CoinTracking data is than used.
-- **Consolidate data from staking operations on a daily basis at midnight** (optional)
+- **Consolidate data from staking operations on a daily basis at midnight** (optional, **EXPERIMENTAL**)
 This can drastically reduce the import amount of data rows for CoinTracking.
 You can switch this on via  `--consolidate-staking-data`.
+
+> **IMPORTANT**: This feature is experimental. Please check your CoinTracking import carefully (and make a backup) and let me know if something is wrong. You cannot switch between the normal mode of this script and this consolidation mode, because the consolidation mode is generating its own Tx-ID's to identify the imported data rows. The only clean solution for switching between these modes would be to delete the complete data set from CoinTracking and reimport if afterwards. Another caveat of the consolidation mode is, that you need to import Cake's data for "complete days". Otherwise some staking data would be lost, because the consolidation mode consolidates all staking data  for each day and defines a new Tx-ID for each day. After this a day is "completed" and no further data is added to CoinTracking for this day.
 
 ## Installation
 
