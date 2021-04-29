@@ -7,14 +7,14 @@ CLI script to translate [Cake](https://pool.cakedefi.com/#?ref=401824) export da
 
 ## Features
 
-- **Supports german and english CoinTracking import**
+- **Supports german and english CoinTracking import** \
 English is used by default.
-- **Generates simple overview of current holdings at cake**
+- **Generates simple overview of current holdings at cake** \
 The overview is displayed in the shell after script execution.
-- **Uses Cake's FIAT valuation for each transaction in your chosen export currency inestead of the CoinTracking valuation data**
+- **Uses Cake's FIAT valuation for each transaction in your chosen export currency inestead of the CoinTracking valuation data** \
 Keep in mind that your CoinTracking account currency should match your exported transaction valutation currency from Cake.
 This feature can be disabled via `--use-cointracking-fiat-valuation`. The CoinTracking data is than used.
-- **Consolidate data from staking operations on a daily basis at midnight** (optional, **EXPERIMENTAL**)
+- **Consolidate data from staking operations on a daily basis at midnight** (optional, **EXPERIMENTAL**) \
 This can drastically reduce the import amount of data rows for CoinTracking.
 You can switch this on via  `--consolidate-staking-data`.
 
