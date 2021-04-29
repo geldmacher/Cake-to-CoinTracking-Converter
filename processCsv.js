@@ -124,7 +124,7 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
 
             // Consolidate staking data rows by day at midnight
             if(consolidateStakingData && records.length > 0){
-                records = consolidateData(records);
+                records = consolidateData(records, translatedCtTypes, useCtFiatValuation);
             }
 
             // Handle LM records
