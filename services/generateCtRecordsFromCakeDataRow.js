@@ -1,10 +1,5 @@
 const Decimal = require('decimal.js');
 
-Decimal.set({ 
-    precision: 100,
-    minE: -500
-});
-
 /**
  * Translate Cake records to CoinTracking records
  * 
@@ -78,6 +73,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 break;
             case 'Lapis DFI Bonus':
             case 'Lending DFI Bonus':
+            case 'Confectionery Lending DFI Bonus':
                 data['Type'] = translatedCtTypes.interest_income;
                 data['Trade-Group'] = 'Lending';
                 data['Buy Currency'] = row['Coin/Asset'];
@@ -111,6 +107,15 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 data['Buy Amount'] = row['Amount'].replace('-','');
                 data['Buy Value in your Account Currency'] = useCtFiatValuation ? '' : row['FIAT value'].replace('-','');
                 break;
+            case 'Referral reward':
+            case 'Referral signup bonus':
+            case 'Signup bonus':
+                data['Type'] = translatedCtTypes.income;
+                data['Trade-Group'] = 'Referral';
+                data['Buy Currency'] = row['Coin/Asset'];
+                data['Buy Amount'] = row['Amount'].replace('-','');
+                data['Buy Value in your Account Currency'] = useCtFiatValuation ? '' : row['FIAT value'].replace('-','');
+                break;        
             default:
                 let notHandledOperation = row['Operation'];
                 // Preserve LM related rows which are related to each other and transfer their data to another handling mechanism

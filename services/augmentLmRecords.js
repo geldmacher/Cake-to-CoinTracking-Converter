@@ -1,10 +1,5 @@
 const Decimal = require('decimal.js');
 
-Decimal.set({ 
-    precision: 100,
-    minE: -500
-});
-
 /**
  * Augment LM records
  * 

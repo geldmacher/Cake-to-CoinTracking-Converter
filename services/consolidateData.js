@@ -1,11 +1,6 @@
 const Decimal = require('decimal.js');
 const { v5: uuidv5 } = require('uuid');
 
-Decimal.set({ 
-    precision: 100,
-    minE: -500
-});
-
 /**
  * Consolidate data rows
  * 
