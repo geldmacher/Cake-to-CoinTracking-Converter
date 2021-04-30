@@ -2,7 +2,7 @@
 
 CLI script to translate [Cake](https://pool.cakedefi.com/#?ref=401824) export data to a valid [CoinTracking](https://cointracking.info?ref=G905622) import.
 
-**IMPORTANT**: Make a backup of your trades before you import new data via this script!
+**IMPORTANT**: Make a backup of your trades before you import new data via this script! \
 **EVEN MORE IMPORTANT**: This is no tax advice! The way this script imports data is potentially wrong.
 
 ## Features
