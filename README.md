@@ -68,6 +68,13 @@ cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\cointracking
 - Removed liquidity
 - Liquidity mining reward XXX-YYY
 
+## Sponsor me
+
+I made it a lot more easy for you to manage your Cake data with CoinTracking? Show me some love! ;D
+
+Your options:
+- [GitHub Sponsors](https://github.com/sponsors/geldmacher)
+
 ---
 
 **Something missing?** Open an [issue](https://github.com/geldmacher/Cake-to-CoinTracking-Converter/issues) or make a PR! ;D
