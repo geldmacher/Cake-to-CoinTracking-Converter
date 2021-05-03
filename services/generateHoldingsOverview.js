@@ -61,6 +61,4 @@ const generateHoldingsOverview = (records) => {
     return table(Array.from(stats.values()));
 }
 
-
-
 module.exports.generateHoldingsOverview = generateHoldingsOverview;
