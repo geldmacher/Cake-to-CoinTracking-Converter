@@ -39,5 +39,11 @@
     "table": "^6.6.0",
     "uuid": "^8.3.2",
     "yargs": "^16.2.0"
-  }
+  },
+  "funding": [
+    {
+      "type" : "GitHub Sponsors",
+      "url" : "https://github.com/sponsors/geldmacher"
+    }
+  ]
 }
