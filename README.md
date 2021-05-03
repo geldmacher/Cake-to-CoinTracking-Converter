@@ -1,6 +1,6 @@
 # Cake to CoinTracking Converter
 
-CLI script to translate [Cake](https://pool.cakedefi.com/#?ref=401824) export data to a valid [CoinTracking](https://cointracking.info?ref=G905622) import.
+CLI script to translate [Cake](https://app.cakedefi.com/#?ref=401824) export data to a valid [CoinTracking](https://cointracking.info?ref=G905622) import.
 
 **IMPORTANT**: Make a backup of your trades before you import new data via this script! \
 **EVEN MORE IMPORTANT**: This is no tax advice! The way this script imports data is potentially wrong.
@@ -72,8 +72,8 @@ cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\cointracking
 
 I made it a lot more easy for you to manage your Cake data with CoinTracking? Show me some love! ;D
 
-Your options:
-- [GitHub Sponsors](https://github.com/sponsors/geldmacher)
+Your options: \
+:heart: [**GitHub** Sponsors](https://github.com/sponsors/geldmacher)
 
 ---
 
