@@ -74,6 +74,7 @@ I made it a lot more easy for you to manage your Cake data with CoinTracking? Sh
 
 Your options: \
 :heart: [**GitHub** Sponsors](https://github.com/sponsors/geldmacher) \
+:heart: DeFiChain (**DFI**) Address: `dXuDCyiH82qL5wQ7eNmQVmfM68fgntrPy1` \
 :heart: Bitcoin (**BTC**) Address: `bc1q04z9xnuf9adac042k44q9v0j4ur7exkr5tp85t` \
 :heart: Ethereum (**ETH**) Address: `0xAb1c000a139B18a5B3F48cDA0e9eeF57eF842902`
 
