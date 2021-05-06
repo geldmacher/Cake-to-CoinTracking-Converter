@@ -1,6 +1,6 @@
 {
   "name": "cake-to-cointracking-converter",
-  "version": "3.1.0",
+  "version": "3.1.2",
   "description": "CLI script to translate Cake export data to a valid CoinTracking import",
   "main": "./processCsv.js",
   "scripts": {
@@ -44,6 +44,14 @@
     {
       "type" : "GitHub Sponsors",
       "url" : "https://github.com/sponsors/geldmacher"
+    },
+    {
+      "type" : "Bitcoin (BTC)",
+      "url" : "bc1q04z9xnuf9adac042k44q9v0j4ur7exkr5tp85t"
+    },
+    {
+      "type" : "Ethereum (ETH)",
+      "url" : "0xAb1c000a139B18a5B3F48cDA0e9eeF57eF842902"
     }
   ]
 }
