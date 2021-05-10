@@ -1,6 +1,11 @@
 const Decimal = require('decimal.js');
 const { v5: uuidv5 } = require('uuid');
 
+// Allow extreme small numbers with exponential notation
+Decimal.set({
+    toExpNeg: -9e15
+});
+
 /**
  * Consolidate data rows
  * 

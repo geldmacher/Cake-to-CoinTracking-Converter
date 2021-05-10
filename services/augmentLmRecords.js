@@ -1,5 +1,10 @@
 const Decimal = require('decimal.js');
 
+// Allow extreme small numbers with exponential notation
+Decimal.set({
+    toExpNeg: -9e15
+});
+
 /**
  * Augment LM records
  * 
