@@ -84,12 +84,12 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
     cakeCsvStream
         .on('error', error => {
             progressBar.stop();
-            console.error('\n' + error);
+            console.error('\n' + chalk.bold(chalk.red(error)) + '\n');
         })
         .pipe(csv())
         .on('error', error => {
             progressBar.stop();
-            console.error('\n' + error);
+            console.error('\n' + chalk.bold(chalk.red(error)) + '\n');
         })
         .on('data', row => {
             handledRecords = generateCtRecordsFromCakeDataRow(row, translatedCtTypes, useCtFiatValuation);
@@ -114,7 +114,7 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
             progressBar.updateETA();
         })
         .on('error', error => {
-            console.error('\n' + error);
+            console.error('\n' + chalk.bold(chalk.red(error)) + '\n');
             progressBar.stop();
         })
         .on('end', () => {
@@ -146,7 +146,7 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
             }, (error, output) => {
                 if (error) {
                     progressBar.stop();
-                    console.error('\n' + chalk.bold(chalk.green(error)) + '\n');
+                    console.error('\n' + chalk.bold(chalk.red(error)) + '\n');
                 } else {
                     if(output){
                         fs.writeFile(ctCsvFile, output, error => {
@@ -168,14 +168,14 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
                         });
                     } else {
                         progressBar.stop();
-                        console.error('\n' + chalk.bold(chalk.green('Could not write CoinTracking file.')) + '\n');
+                        console.error('\n' + chalk.bold(chalk.red('Could not write CoinTracking file.')) + '\n');
                     }
                 }
             })
         })
         .on('error', error => {
             progressBar.stop();
-            console.error('\n' + chalk.bold(chalk.green(error)) + '\n');
+            console.error('\n' + chalk.bold(chalk.red(error)) + '\n');
         });
 };
 
