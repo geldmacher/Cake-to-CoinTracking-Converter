@@ -3,6 +3,11 @@ const chalk  = require('chalk');
 const Decimal = require('decimal.js');
 const { v5: uuidv5 } = require('uuid');
 
+// Allow extreme small numbers with exponential notation
+Decimal.set({ 
+    toExpNeg: -9e15
+ });
+
 // Stats
 const stats = new Map();
 
@@ -17,14 +22,13 @@ const updateStats = (record, isSell) => {
     // Unique namespace -> https://www.uuidgenerator.net/
     const currency = isSell ? record['Sell Currency'] : record['Buy Currency'];
     const identifier = uuidv5(currency, '82f84ac6-c3c4-4de5-8d70-a7ce0aacde4f');
-
-    let amount = isSell ? '-' + record['Sell Amount'] : record['Buy Amount'];
+    const amount = isSell ? record['Sell Amount'] : record['Buy Amount'];
 
     if(stats.has(identifier)){
         const statsRecord = stats.get(identifier);
         const data = [
             currency,
-            new Decimal(statsRecord[1]).plus(amount).toString()
+            (isSell ? new Decimal(statsRecord[1]).minus(amount).toString() : new Decimal(statsRecord[1]).plus(amount).toString())
         ];
         stats.set(identifier, data);
     } else {
@@ -52,8 +56,7 @@ const generateHoldingsOverview = (records) => {
 
     // Table rows
     records.forEach(record => {
-
-        // Trade
+        // Is trade
         if(record['Buy Currency'] && record['Sell Currency']){
             updateStats(record, true);
             updateStats(record, false);
