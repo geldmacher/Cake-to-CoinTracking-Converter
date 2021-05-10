@@ -139,8 +139,8 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 }
                 // Log operations which are currently not supported
                 if(notHandledOperation){
+                    row['_error'] = 'Not able to handle Cake\'s "' + notHandledOperation + '" operation atm. Post an issue or make a PR: https://github.com/geldmacher/Cake-to-CoinTracking-Converter';
                     skippedRecords.push(row);
-                    console.info('\n' + 'Not able to handle Cake\'s "' + notHandledOperation + '" operation atm.');
                 }
             break;
         }
@@ -148,10 +148,9 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
         if(data['Type'] && data['Type'].length > 0){
             records.push(data);
         }
-    } catch(err) {
+    } catch(error) {
+        row['_error'] = error;
         skippedRecords.push(row);
-        console.error('\n' + err);
-        process.exit();
     }
     
     return [records, skippedRecords, lmRecords];

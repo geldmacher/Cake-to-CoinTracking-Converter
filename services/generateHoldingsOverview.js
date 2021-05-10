@@ -6,7 +6,12 @@ const { v5: uuidv5 } = require('uuid');
 // Stats
 const stats = new Map();
 
-// Updates stats
+/**
+ * Update stats map
+ * 
+ * @param {*} record 
+ * @param {*} isSell 
+ */
 const updateStats = (record, isSell) => {
     // Generate own uuid to identify record groups
     // Unique namespace -> https://www.uuidgenerator.net/
@@ -19,13 +24,13 @@ const updateStats = (record, isSell) => {
         const statsRecord = stats.get(identifier);
         const data = [
             currency,
-            new Decimal(statsRecord[1]).plus(amount).toString(),
+            new Decimal(statsRecord[1]).plus(amount).toString()
         ];
         stats.set(identifier, data);
     } else {
         const data = [
             currency,
-            amount,
+            amount
         ];
         stats.set(identifier, data);
     }
@@ -38,14 +43,14 @@ const updateStats = (record, isSell) => {
  */
 const generateHoldingsOverview = (records) => {
 
-    // table header
+    // Table header
     const header = [
         chalk.dim(chalk.bold('Coin / Asset')),
         chalk.dim(chalk.bold('Amount'))
     ];
     stats.set('header', header);
 
-    // table rows
+    // Table rows
     records.forEach(record => {
 
         // Trade
@@ -57,7 +62,7 @@ const generateHoldingsOverview = (records) => {
         }
     });
 
-    // table output
+    // Table output
     return table(Array.from(stats.values()));
 }
 

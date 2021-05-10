@@ -3,11 +3,13 @@ const path = require('path');
 const csv = require('csv-parser');
 const stringify = require('csv-stringify');
 const cliProgress = require('cli-progress');
+const chalk  = require('chalk');
 
 const { consolidateData } = require('./services/consolidateData');
 const { augmentLmRecords } = require('./services/augmentLmRecords');
 const { generateCtRecordsFromCakeDataRow } = require('./services/generateCtRecordsFromCakeDataRow');
 const { generateHoldingsOverview } = require('./services/generateHoldingsOverview');
+const { generateErrorDetailsOverview } = require('./services/generateErrorDetailsOverview');
 
 // CoinTracking type fields need to be in the language of your CoinTracking UI
 const ctType = {
@@ -117,11 +119,6 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
         })
         .on('end', () => {
 
-            // Any skipped records?
-            if(skippedRecords.length > 0){
-                console.info('\n' + 'Some data rows where skipped.');
-            }
-
             // Consolidate staking data rows by day at midnight
             if(consolidateStakingData && records.length > 0){
                 records = consolidateData(records, translatedCtTypes, useCtFiatValuation);
@@ -149,28 +146,36 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
             }, (error, output) => {
                 if (error) {
                     progressBar.stop();
-                    console.error('\n' + error);
+                    console.error('\n' + chalk.bold(chalk.green(error)) + '\n');
                 } else {
                     if(output){
                         fs.writeFile(ctCsvFile, output, error => {
                             progressBar.stop();
                             if (error) {
-                                console.error('\n' + error);
+                                console.error('\n' + chalk.bold(chalk.red(error)) + '\n');
                             } else {
-                                console.log('\n' + holdings);
-                                console.info('\n' + 'Done! Wrote Cake data to CoinTracking file.');
+                                console.info('\n' + chalk.bold(chalk.green('Done! Wrote Cake data to CoinTracking file.')));
+                                console.info('\n' + chalk.underline(chalk.bold('Your current holdings at Cake:')));
+                                console.log('\n' + holdings + '\n');
+                                
+                                // Any skipped records?
+                                if(skippedRecords.length > 0){
+                                    console.info(chalk.underline(chalk.bold(chalk.yellow('Some data rows where skipped:'))));
+                                    const skippedRowsErrorsDetailsOutput = generateErrorDetailsOverview(skippedRecords);
+                                    console.log('\n' + skippedRowsErrorsDetailsOutput + '\n');
+                                }
                             }
                         });
                     } else {
                         progressBar.stop();
-                        console.error('\n' + 'Could not write CoinTracking file.');
+                        console.error('\n' + chalk.bold(chalk.green('Could not write CoinTracking file.')) + '\n');
                     }
                 }
             })
         })
         .on('error', error => {
             progressBar.stop();
-            console.error('\n' + error);
+            console.error('\n' + chalk.bold(chalk.green(error)) + '\n');
         });
 };
 
