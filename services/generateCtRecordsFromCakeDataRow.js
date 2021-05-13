@@ -48,13 +48,15 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 data['Sell Value in your Account Currency'] = useCtFiatValuation ? row['Sell FIAT value'].replace('-','') : '';
                 break;
             case 'Deposit':
+            case 'Swapped in':
                 data['Type'] = translatedCtTypes.deposit;
                 data['Trade-Group'] = 'Deposit';
                 data['Buy Currency'] = row['Coin/Asset'];
                 data['Buy Amount'] = row['Amount'].replace('-','');
                 data['Buy Value in your Account Currency'] = useCtFiatValuation ? '' : row['FIAT value'].replace('-','');
                 break;
-            case 'Withdrawal': 
+            case 'Withdrawal':
+            case 'Swapped out':
                 data['Type'] = translatedCtTypes.withdrawal;
                 data['Trade-Group'] = 'Withdrawal';
                 data['Sell Currency'] = row['Coin/Asset'];
