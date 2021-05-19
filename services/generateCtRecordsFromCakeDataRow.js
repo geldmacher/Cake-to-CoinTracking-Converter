@@ -91,6 +91,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 data['Buy Currency'] = row['Coin/Asset'];
                 data['Buy Amount'] = row['Amount'].replace('-','');
                 data['Buy Value in your Account Currency'] = useCtFiatValuation ? '' : row['FIAT value'].replace('-','');
+                break;
             case 'Freezer staking bonus':
                 data['Type'] = translatedCtTypes.staking;
                 data['Trade-Group'] = 'Staking';
