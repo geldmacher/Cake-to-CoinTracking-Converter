@@ -14,7 +14,7 @@ The overview is displayed in the shell after script execution.
 - **Uses Cake's FIAT valuation for each transaction in your chosen export currency instead of the CoinTracking valuation data** \
 Keep in mind that your CoinTracking account currency should match your exported transaction valutation currency from Cake.
 This feature can be disabled via `--use-cointracking-fiat-valuation`. The CoinTracking data is than used.
-- **Generates correct trades for Liquidity Mining and Swap operations** \
+- **Generates trades for Liquidity Mining and Swap operations** \
 In case of Liquidity mining operations this script generates trades from the used assets (eg BTC and DFI) to theri corresponding pool tokens (eg BTC-DFI) and vice versa. Even the correct FIAT valuation for the pool tokens is transmitted to CoinTracking.
 - **Consolidate data from staking operations on a daily basis at midnight** (**EXPERIMENTAL**) \
 This can drastically reduce the import amount of data rows for CoinTracking.
