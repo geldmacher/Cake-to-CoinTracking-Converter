@@ -7,6 +7,7 @@ const chalk  = require('chalk');
 
 const { consolidateData } = require('./services/consolidateData');
 const { augmentLmRecords } = require('./services/augmentLmRecords');
+const { augmentSwapRecords } = require('./services/augmentSwapRecords');
 const { generateCtRecordsFromCakeDataRow } = require('./services/generateCtRecordsFromCakeDataRow');
 const { generateHoldingsOverview } = require('./services/generateHoldingsOverview');
 const { generateErrorDetailsOverview } = require('./services/generateErrorDetailsOverview');
@@ -78,6 +79,7 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
     let records = [];
     let skippedRecords = [];
     let lmRecords = [];
+    let swapRecords = [];
 
     progressBar.start(1, 0);
 
@@ -109,8 +111,13 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
                 lmRecords = [...lmRecords, ...handledRecords[2]];
                 progressBar.increment(handledRecords[2].length);
             }
+            // Swap records
+            if (handledRecords[3].length > 0) {
+                swapRecords = [...swapRecords, ...handledRecords[3]];
+                progressBar.increment(handledRecords[3].length);
+            }
 
-            progressBar.setTotal(records.length + skippedRecords.length + lmRecords.length);
+            progressBar.setTotal(records.length + skippedRecords.length + lmRecords.length + swapRecords.length);
             progressBar.updateETA();
         })
         .on('error', error => {
@@ -129,6 +136,17 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
                 const augmentedLmRecords = augmentLmRecords(lmRecords);
                 augmentedLmRecords.forEach(augmentedLmRecord => {
                     handledRecords = generateCtRecordsFromCakeDataRow(augmentedLmRecord, translatedCtTypes, useCtFiatValuation);
+                    if (handledRecords[0].length > 0) {
+                        records = [...records, ...handledRecords[0]];
+                    } 
+                });
+            }
+
+            // Handle Swap records
+            if(swapRecords.length > 0){
+                const augmentedSwapRecords = augmentSwapRecords(swapRecords);
+                augmentedSwapRecords.forEach(augmentedSwapRecord => {
+                    handledRecords = generateCtRecordsFromCakeDataRow(augmentedSwapRecord, translatedCtTypes, useCtFiatValuation);
                     if (handledRecords[0].length > 0) {
                         records = [...records, ...handledRecords[0]];
                     } 

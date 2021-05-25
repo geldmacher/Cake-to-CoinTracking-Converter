@@ -17,6 +17,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
     const records = [];
     const skippedRecords = [];
     const lmRecords = [];
+    const swapRecords = [];
 
     try {
         const data = {
@@ -37,9 +38,19 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
         };
 
         switch(row['Operation']){
-            case 'Liquidity mining pool trade':
+            case 'Liquidity mining pool trade': // Custom operation (@see ./augmentLmRecords.js)
                 data['Type'] = translatedCtTypes.trade;
                 data['Trade-Group'] = 'Liquidity Mining';
+                data['Buy Currency'] = row['Buy Coin/Asset'];
+                data['Buy Amount'] = row['Buy Amount'].replace('-','');
+                data['Buy Value in your Account Currency'] = useCtFiatValuation ? row['Buy FIAT value'].replace('-','') : '';
+                data['Sell Currency'] = row['Sell Coin/Asset'];
+                data['Sell Amount'] = row['Sell Amount'].replace('-','');
+                data['Sell Value in your Account Currency'] = useCtFiatValuation ? row['Sell FIAT value'].replace('-','') : '';
+                break;
+            case 'Swap trade': // Custom operation (@see ./augmentSwapRecords.js)
+                data['Type'] = translatedCtTypes.trade;
+                data['Trade-Group'] = 'Swap';
                 data['Buy Currency'] = row['Buy Coin/Asset'];
                 data['Buy Amount'] = row['Buy Amount'].replace('-','');
                 data['Buy Value in your Account Currency'] = useCtFiatValuation ? row['Buy FIAT value'].replace('-','') : '';
@@ -134,6 +145,11 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                     lmRecords.push(row);
                     notHandledOperation = '';
                 }
+                // Preserve swap related rows which are related to each other and transfer their data to another handling mechanism
+                if(row['Operation'] === 'Swapped in' || row['Operation'] === 'Swapped out'){
+                    swapRecords.push(row);
+                    notHandledOperation = '';
+                }
                 // Handle "Liquidity mining reward AAA(A)-BBB"
                 if(/^Liquidity mining reward [A-Z]{3,4}-[A-Z]{3}$/.test(row['Operation'])){
                     data['Type'] = translatedCtTypes.income;
@@ -159,7 +175,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
         skippedRecords.push(row);
     }
     
-    return [records, skippedRecords, lmRecords];
+    return [records, skippedRecords, lmRecords, swapRecords];
 }
 
 module.exports.generateCtRecordsFromCakeDataRow = generateCtRecordsFromCakeDataRow;

@@ -67,6 +67,8 @@ cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\cointracking
 - Added liquidity
 - Removed liquidity
 - Liquidity mining reward XXX-YYY
+- Swapped in
+- Swapped out
 
 ## Sponsor me
 
