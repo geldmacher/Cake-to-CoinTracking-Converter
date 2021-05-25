@@ -1,6 +1,6 @@
 {
   "name": "cake-to-cointracking-converter",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "description": "CLI script to translate Cake export data to a valid CoinTracking import",
   "main": "./processCsv.js",
   "scripts": {
@@ -36,26 +36,26 @@
     "csv-parser": "^3.0.0",
     "csv-stringify": "^5.6.2",
     "decimal.js": "^10.2.1",
-    "table": "^6.6.0",
+    "table": "^6.7.1",
     "uuid": "^8.3.2",
-    "yargs": "^16.2.0"
+    "yargs": "^17.0.1"
   },
   "funding": [
     {
-      "type" : "GitHub Sponsors",
-      "url" : "https://github.com/sponsors/geldmacher"
+      "type": "GitHub Sponsors",
+      "url": "https://github.com/sponsors/geldmacher"
     },
     {
-      "type" : "DeFiChain (DFI)",
-      "url" : "dXuDCyiH82qL5wQ7eNmQVmfM68fgntrPy1"
+      "type": "DeFiChain (DFI)",
+      "url": "dXuDCyiH82qL5wQ7eNmQVmfM68fgntrPy1"
     },
     {
-      "type" : "Bitcoin (BTC)",
-      "url" : "bc1q04z9xnuf9adac042k44q9v0j4ur7exkr5tp85t"
+      "type": "Bitcoin (BTC)",
+      "url": "bc1q04z9xnuf9adac042k44q9v0j4ur7exkr5tp85t"
     },
     {
-      "type" : "Ethereum (ETH)",
-      "url" : "0xAb1c000a139B18a5B3F48cDA0e9eeF57eF842902"
+      "type": "Ethereum (ETH)",
+      "url": "0xAb1c000a139B18a5B3F48cDA0e9eeF57eF842902"
     }
   ]
 }
