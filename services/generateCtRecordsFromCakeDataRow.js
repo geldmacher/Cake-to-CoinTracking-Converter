@@ -18,6 +18,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
     const skippedRecords = [];
     const lmRecords = [];
     const swapRecords = [];
+    const discountRecords = [];
 
     try {
         const data = {
@@ -58,6 +59,16 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 data['Sell Amount'] = row['Sell Amount'].replace('-','');
                 data['Sell Value in your Account Currency'] = useCtFiatValuation ? row['Sell FIAT value'].replace('-','') : '';
                 break;
+            case 'Discount trade': // Custom operation (@see ./augmentDiscountRecords.js)
+                data['Type'] = translatedCtTypes.trade;
+                data['Trade-Group'] = 'Discount';
+                data['Buy Currency'] = row['Buy Coin/Asset'];
+                data['Buy Amount'] = row['Buy Amount'].replace('-','');
+                data['Buy Value in your Account Currency'] = useCtFiatValuation ? row['Buy FIAT value'].replace('-','') : '';
+                data['Sell Currency'] = row['Sell Coin/Asset'];
+                data['Sell Amount'] = row['Sell Amount'].replace('-','');
+                data['Sell Value in your Account Currency'] = useCtFiatValuation ? row['Sell FIAT value'].replace('-','') : '';
+                break;    
             case 'Deposit':
                 data['Type'] = translatedCtTypes.deposit;
                 data['Trade-Group'] = 'Deposit';
@@ -150,6 +161,11 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                     swapRecords.push(row);
                     notHandledOperation = '';
                 }
+                // Preserve discount related rows which are related to each other and transfer their data to another handling mechanism
+                if(row['Operation'] === 'Claimed for 50% discount' || row['Operation'] === 'Used for 50% discount'){
+                    discountRecords.push(row);
+                    notHandledOperation = '';
+                }
                 // Handle "Liquidity mining reward AAA(A)-BBB"
                 if(/^Liquidity mining reward [A-Z]{3,4}-[A-Z]{3}$/.test(row['Operation'])){
                     data['Type'] = translatedCtTypes.income;
@@ -175,7 +191,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
         skippedRecords.push(row);
     }
     
-    return [records, skippedRecords, lmRecords, swapRecords];
+    return [records, skippedRecords, lmRecords, swapRecords, discountRecords];
 }
 
 module.exports.generateCtRecordsFromCakeDataRow = generateCtRecordsFromCakeDataRow;

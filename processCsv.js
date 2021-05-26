@@ -8,6 +8,7 @@ const chalk  = require('chalk');
 const { consolidateData } = require('./services/consolidateData');
 const { augmentLmRecords } = require('./services/augmentLmRecords');
 const { augmentSwapRecords } = require('./services/augmentSwapRecords');
+const { augmentDiscountRecords } = require('./services/augmentDiscountRecords');
 const { generateCtRecordsFromCakeDataRow } = require('./services/generateCtRecordsFromCakeDataRow');
 const { generateHoldingsOverview } = require('./services/generateHoldingsOverview');
 const { generateErrorDetailsOverview } = require('./services/generateErrorDetailsOverview');
@@ -80,6 +81,7 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
     let skippedRecords = [];
     let lmRecords = [];
     let swapRecords = [];
+    let discountRecords = [];
 
     progressBar.start(1, 0);
 
@@ -116,8 +118,13 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
                 swapRecords = [...swapRecords, ...handledRecords[3]];
                 progressBar.increment(handledRecords[3].length);
             }
+            // Discount records
+            if (handledRecords[4].length > 0) {
+                discountRecords = [...discountRecords, ...handledRecords[4]];
+                progressBar.increment(handledRecords[4].length);
+            }
 
-            progressBar.setTotal(records.length + skippedRecords.length + lmRecords.length + swapRecords.length);
+            progressBar.setTotal(records.length + skippedRecords.length + lmRecords.length + swapRecords.length + discountRecords.length);
             progressBar.updateETA();
         })
         .on('error', error => {
@@ -147,6 +154,17 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
                 const augmentedSwapRecords = augmentSwapRecords(swapRecords);
                 augmentedSwapRecords.forEach(augmentedSwapRecord => {
                     handledRecords = generateCtRecordsFromCakeDataRow(augmentedSwapRecord, translatedCtTypes, useCtFiatValuation);
+                    if (handledRecords[0].length > 0) {
+                        records = [...records, ...handledRecords[0]];
+                    } 
+                });
+            }
+
+            // Handle Discount records
+            if(discountRecords.length > 0){
+                const augmentedDiscountRecords = augmentDiscountRecords(discountRecords);
+                augmentedDiscountRecords.forEach(augmentedDiscountRecord => {
+                    handledRecords = generateCtRecordsFromCakeDataRow(augmentedDiscountRecord, translatedCtTypes, useCtFiatValuation);
                     if (handledRecords[0].length > 0) {
                         records = [...records, ...handledRecords[0]];
                     } 
