@@ -25,7 +25,7 @@
     "defi"
   ],
   "author": "Dennis Geldmacher",
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "bugs": {
     "url": "https://github.com/geldmacher/Cake-to-CoinTracking-Converter/issues"
   },
