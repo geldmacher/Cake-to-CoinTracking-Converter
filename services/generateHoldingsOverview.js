@@ -34,7 +34,7 @@ const updateStats = (record, isSell) => {
     } else {
         const data = [
             currency,
-            amount
+            (isSell ? new Decimal(0).minus(amount).toString() : new Decimal(0).plus(amount).toString())
         ];
         stats.set(identifier, data);
     }
