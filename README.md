@@ -3,14 +3,14 @@
 CLI script to translate [Cake](https://app.cakedefi.com/#?ref=401824) export data to a valid [CoinTracking](https://cointracking.info?ref=G905622) import.
 
 **IMPORTANT**: Make a backup of your trades before you import new data via this script! \
-**EVEN MORE IMPORTANT**: This is no tax advice! The way this script imports data is potentially wrong.
+**EVEN MORE IMPORTANT**: This is no tax advice! The way this script imports data might be wrong.
 
 ## Features
 
 - **Supports german and english CoinTracking import** \
 English is used by default.
-- **Generates simple overview of current holdings at cake** \
-The overview is displayed in the shell after script execution.
+- **Displays simple overview of current holdings at cake** \
+The overview is displayed in the shell after script execution. You need the export data of your complete Cake usage time. Otherwise this overview is nonsense.
 - **Uses Cake's FIAT valuation for each transaction in your chosen export currency instead of the CoinTracking valuation data** \
 Keep in mind that your CoinTracking account currency should match your exported transaction valutation currency from Cake.
 This feature can be disabled via `--use-cointracking-fiat-valuation`. The CoinTracking data is than used.
@@ -47,6 +47,7 @@ cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\cointracking
 - `--cake-csv` - Path to Cake CSV.
 - `--ct-csv` - Path to CoinTracking CSV. Creates one, if it is not existing.
 - `--language` (optional) - Used language for CoinTracking import file. "DE" and "EN" are supported. Default is "EN".
+- `--display-holdings-overview` (optional) - Displays simple overview of current holdings at cake. You need the export data of your complete Cake usage time. Otherwise this overview is nonsense.
 - `--consolidate-staking-data` (optional) - Consolidate data from staking operations on a daily basis at midnight.
 - `--use-cointracking-fiat-valuation` (optional) - Use the FIAT transaction valuation from CoinTracking instead of the valuation data from Cake.
 

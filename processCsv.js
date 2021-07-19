@@ -57,8 +57,9 @@ const ctType = {
  * @param {*} language 
  * @param {*} useCtFiatValuation 
  * @param {*} consolidateStakingData 
+ * @param {*} displayHoldingsOverview 
  */
-const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consolidateStakingData) => {
+const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consolidateStakingData, displayHoldingsOverview) => {
 
     // EN is the default language
     const normalizedLanguage = (language.length > 0) ? language.toLowerCase() : 'en';
@@ -172,7 +173,10 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
             }
 
             // Output holdings
-            const holdings = generateHoldingsOverview(records);
+            let holdings;
+            if(displayHoldingsOverview){
+                holdings = generateHoldingsOverview(records);
+            }
 
             // Build CoinTracking CSV file
             stringify(records, {
@@ -191,8 +195,10 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
                                 console.error('\n' + chalk.bold(chalk.red(error)) + '\n');
                             } else {
                                 console.info('\n' + chalk.bold(chalk.green('Done! Wrote Cake data to CoinTracking file.')));
-                                console.info('\n' + chalk.underline(chalk.bold('Your current holdings at Cake:')));
-                                console.log('\n' + holdings + '\n');
+                                if(displayHoldingsOverview){
+                                    console.info('\n' + chalk.underline(chalk.bold('Your current holdings at Cake:')));
+                                    console.log('\n' + holdings + '\n');
+                                }
                                 
                                 // Any skipped records?
                                 if(skippedRecords.length > 0){
