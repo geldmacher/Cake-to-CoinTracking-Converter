@@ -24,11 +24,11 @@ You can switch this on via  `--consolidate-staking-data`.
 
 ## Installation
 
-[Node.js](https://nodejs.org/) is required to run this script.
+1) [Node.js](https://nodejs.org/) is required to run this script. Just download and install the current LTS version.
+2) Install it with your shell via npm (Bundled with Node.js):
 
-Install via npm (Bundled with Node.js):
 ```shell
-npm install cake-to-cointracking-converter
+npm install -g cake-to-cointracking-converter
 ```
 
 ## Usage
