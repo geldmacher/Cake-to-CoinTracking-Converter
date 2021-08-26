@@ -58,8 +58,9 @@ const ctType = {
  * @param {*} useCtFiatValuation 
  * @param {*} consolidateStakingData 
  * @param {*} displayHoldingsOverview 
+ * @param {*} noAutoStakeRewards 
  */
-const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consolidateStakingData, displayHoldingsOverview) => {
+const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consolidateStakingData, displayHoldingsOverview, noAutoStakeRewards) => {
 
     // EN is the default language
     const normalizedLanguage = (language.length > 0) ? language.toLowerCase() : 'en';
@@ -97,7 +98,7 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
             console.error('\n' + chalk.bold(chalk.red(error)) + '\n');
         })
         .on('data', row => {
-            handledRecords = generateCtRecordsFromCakeDataRow(row, translatedCtTypes, useCtFiatValuation);
+            handledRecords = generateCtRecordsFromCakeDataRow(row, translatedCtTypes, useCtFiatValuation, noAutoStakeRewards);
 
             // Normal records
             if (handledRecords[0].length > 0) {

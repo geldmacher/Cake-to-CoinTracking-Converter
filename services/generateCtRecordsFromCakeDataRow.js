@@ -11,8 +11,9 @@ Decimal.set({
  * @param {*} row  
  * @param {*} translatedCtTypes 
  * @param {*} useCtFiatValuation  
+ * @param {*} noAutoStakeRewards  
  */
-const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValuation) => {
+const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValuation, noAutoStakeRewards) => {
 
     const records = [];
     const skippedRecords = [];
@@ -50,7 +51,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 data['Sell Value in your Account Currency'] = useCtFiatValuation ? row['Sell FIAT value'].replace('-','') : '';
                 break;
             case 'Freezer liquidity mining bonus':
-                data['Type'] = translatedCtTypes.other_income;
+                data['Type'] = (row['Coin/Asset'] === 'DFI' && !noAutoStakeRewards) ? translatedCtTypes.staking : translatedCtTypes.income;
                 data['Trade-Group'] = 'Liquidity Mining';
                 data['Buy Currency'] = row['Coin/Asset'];
                 data['Buy Amount'] = row['Amount'].replace('-','');
@@ -176,7 +177,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 }
                 // Handle "Liquidity mining reward AAA(A)-BBB"
                 if(/^Liquidity mining reward [A-Z]{3,4}-[A-Z]{3}$/.test(row['Operation'])){
-                    data['Type'] = translatedCtTypes.income;
+                    data['Type'] = (row['Coin/Asset'] === 'DFI' && !noAutoStakeRewards) ? translatedCtTypes.staking : translatedCtTypes.income;
                     data['Trade-Group'] = 'Liquidity Mining';
                     data['Buy Currency'] = row['Coin/Asset'];
                     data['Buy Amount'] = row['Amount'].replace('-','');
