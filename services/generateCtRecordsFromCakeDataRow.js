@@ -49,6 +49,13 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 data['Sell Amount'] = row['Sell Amount'].replace('-','');
                 data['Sell Value in your Account Currency'] = useCtFiatValuation ? row['Sell FIAT value'].replace('-','') : '';
                 break;
+            case 'Freezer liquidity mining bonus':
+                data['Type'] = translatedCtTypes.other_income;
+                data['Trade-Group'] = 'Liquidity Mining';
+                data['Buy Currency'] = row['Coin/Asset'];
+                data['Buy Amount'] = row['Amount'].replace('-','');
+                data['Buy Value in your Account Currency'] = useCtFiatValuation ? '' : row['FIAT value'].replace('-','');
+                break;
             case 'Swap trade': // Custom operation (@see ./augmentSwapRecords.js)
                 data['Type'] = translatedCtTypes.trade;
                 data['Trade-Group'] = 'Swap';
