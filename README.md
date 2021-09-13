@@ -63,6 +63,7 @@ cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\cointracking
 - Lending DFI Bonus
 - Confectionery Lending DFI Bonus
 - Staking reward
+- 10 years freezer reward
 - Freezer promotion bonus
 - Freezer staking bonus
 - Freezer liquidity mining bonus
