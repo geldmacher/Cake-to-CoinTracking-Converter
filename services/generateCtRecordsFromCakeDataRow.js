@@ -155,6 +155,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
             case 'Referral reward':
             case 'Referral signup bonus':
             case 'Signup bonus':
+            case 'Promotion bonus':
                 data['Type'] = translatedCtTypes.income;
                 data['Trade-Group'] = 'Referral';
                 data['Buy Currency'] = row['Coin/Asset'];

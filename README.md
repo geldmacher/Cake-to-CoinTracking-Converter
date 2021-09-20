@@ -59,6 +59,7 @@ cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\cointracking
 - Withdrawal fee
 - Referral reward
 - Referral signup bonus
+- Promotion bonus
 - Lending reward
 - Lending DFI Bonus
 - Confectionery Lending DFI Bonus
