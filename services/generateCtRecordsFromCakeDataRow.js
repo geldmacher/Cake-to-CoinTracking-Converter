@@ -116,6 +116,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 data['Buy Value in your Account Currency'] = useCtFiatValuation ? '' : row['FIAT value'].replace('-','');
                 break;
             case 'Staking reward':
+            case '5 years freezer reward':
             case '10 years freezer reward':
                 data['Type'] = translatedCtTypes.staking;
                 data['Trade-Group'] = 'Staking';

@@ -10,22 +10,22 @@ CLI script to translate [Cake](https://app.cakedefi.com/#?ref=401824) export dat
 - **Supports german and english CoinTracking import** \
 English is used by default.
 - **Displays simple overview of current holdings at cake** \
-The overview is displayed in the shell after script execution. You need the export data of your complete Cake usage time. Otherwise this overview is nonsense.
+The overview is displayed in the CLI after script execution. You need the export data of your complete Cake usage time. Otherwise this overview is nonsense.
 - **Uses Cake's FIAT valuation for each transaction in your chosen export currency instead of the CoinTracking valuation data** \
 Keep in mind that your CoinTracking account currency should match your exported transaction valutation currency from Cake.
-This feature can be disabled via `--use-cointracking-fiat-valuation`. The CoinTracking data is than used.
+_This feature can be disabled via `--use-cointracking-fiat-valuation`. The CoinTracking data is than used._
 - **Generates trades for Liquidity Mining, Swap and "50% Discount" operations** \
 In case of Liquidity mining operations this script generates trades from the used assets (eg BTC and DFI) to their corresponding pool tokens (eg BTC-DFI) and vice versa. Even the correct FIAT valuation for the pool tokens is transmitted to CoinTracking.
 - **Consolidate data from staking operations on a daily basis at midnight** (**EXPERIMENTAL**) \
 This can drastically reduce the import amount of data rows for CoinTracking.
-You can switch this on via  `--consolidate-staking-data`.
+_You can switch this on via  `--consolidate-staking-data`._
 
 > **IMPORTANT**: The consolidation feature is experimental. Please check your CoinTracking import carefully (and make a backup) and let me know if something is wrong. You cannot switch between the normal mode of this script and this consolidation mode, because the consolidation mode is generating its own Tx-ID's to identify the imported data rows. The only clean solution for switching between these modes would be to delete the complete data set from CoinTracking and reimport if afterwards. Another caveat of the consolidation mode is, that you need to import Cake's data for "complete days". Otherwise some staking data would be lost, because the consolidation mode consolidates all staking data for each day and defines a new Tx-ID for each day. After this a day is "completed" and no further data is added to CoinTracking for this day.
 
 ## Installation
 
 1) [Node.js](https://nodejs.org/) is required to run this script. Just download and install the current LTS version.
-2) Install it with your shell via npm (Bundled with Node.js):
+2) Install it with your via npm CLI (Bundled with Node.js):
 
 ```shell
 npm install -g cake-to-cointracking-converter
@@ -33,14 +33,14 @@ npm install -g cake-to-cointracking-converter
 
 ## Usage
 
-1. Get your [Cake export CSV](https://app.cakedefi.com/transactions) for all coins and generate a CoinTracking import CSV via this shell command:
+1. Get your [Cake transactions export](https://app.cakedefi.com/transactions)(CSV) for all coins and generate a CoinTracking import via CLI.
 
-2. Run this script via shell: 
+2. Example CLI command (More [options](#options) below): 
 ```shell 
 cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\cointracking-import-file.csv" --language "DE"
 ```
 
-3. [Import](https://cointracking.info/import/import_csv/) the generated CoinTracking CSV. Just select your file, check your imports on the next page and import your data if everthing is fine.
+3. Import the generated CSV via [CoinTracking CSV Import](https://cointracking.info/import/import_csv/). Just select your file, check your imports on the next page and import your data if everthing is fine.
 
 ## Options
 
@@ -64,6 +64,7 @@ cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\cointracking
 - Lending DFI Bonus
 - Confectionery Lending DFI Bonus
 - Staking reward
+- 5 years freezer reward
 - 10 years freezer reward
 - Freezer promotion bonus
 - Freezer staking bonus
