@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 const { processCsv } = require('../processCsv');
 const yargs = require('yargs');
 const { hideBin } = require('yargs/helpers');
