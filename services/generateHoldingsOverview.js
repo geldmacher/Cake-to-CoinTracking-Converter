@@ -1,4 +1,4 @@
-const { table } = require('table');
+const { table, getBorderCharacters } = require('table');
 const chalk  = require('chalk');
 const Decimal = require('decimal.js');
 const { v5: uuidv5 } = require('uuid');
@@ -66,7 +66,20 @@ const generateHoldingsOverview = (records) => {
     });
 
     // Table output
-    return table(Array.from(stats.values()));
+    return table(Array.from(stats.values()), {
+        border: getBorderCharacters(`norc`),
+        columnDefault: {
+            width: 30
+        },
+        columns: {
+            0: { 
+                width: 10
+            },
+            1: { 
+                width: 25
+            }
+          }
+    });
 }
 
 module.exports.generateHoldingsOverview = generateHoldingsOverview;

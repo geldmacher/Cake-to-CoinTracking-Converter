@@ -1,4 +1,4 @@
-const { table } = require('table');
+const { table, getBorderCharacters } = require('table');
 const chalk  = require('chalk');
 
 /**
@@ -30,7 +30,20 @@ const generateErrorDetailsOverview = (records) => {
     });
 
     // Table output
-    return table(Array.from(errorDetails.values()));
+    return table(Array.from(errorDetails.values()), {
+        border: getBorderCharacters(`norc`),
+        columnDefault: {
+            width: 50
+        },
+        columns: {
+            0: { 
+                width: 40
+            },
+            1: { 
+                width: 70
+            }
+          }
+    });
 }
 
 module.exports.generateErrorDetailsOverview = generateErrorDetailsOverview;
