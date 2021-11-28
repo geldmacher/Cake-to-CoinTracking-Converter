@@ -35,6 +35,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
             'Comment': row['Operation'],
             'Date': new Date(row['Date']).toISOString(),
             'Tx-ID': row['Reference'],
+            'Ref-ID': row['Related reference ID'],
             'Buy Value in your Account Currency': '',
             'Sell Value in your Account Currency': ''
         };
@@ -78,6 +79,12 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 data['Sell Value in your Account Currency'] = useCtFiatValuation ? row['Sell FIAT value'].replace('-','') : '';
                 break;    
             case 'Deposit':
+                // Deposit operations with a reference ID are handled via DefiChain DEX and not fully integrated in the Cake export data
+                // Swap withdrawel and paid swap fee are marked as "unknown" operation
+                if(data['Ref-ID'] && data['Ref-ID'].length > 0){
+                    row['_error'] = 'DefiChain DEX operations (like Swaps) are not traversable right now, because some related data is incomplete in the Cake export (Swap withdrawel and paid swap fee are marked as "unknown" operation). See this issue: https://github.com/geldmacher/Cake-to-CoinTracking-Converter/issues/10';
+                    skippedRecords.push(row);
+                }
                 data['Type'] = translatedCtTypes.deposit;
                 data['Trade-Group'] = 'Deposit';
                 data['Buy Currency'] = row['Coin/Asset'];
