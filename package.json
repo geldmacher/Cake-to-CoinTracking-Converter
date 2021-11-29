@@ -1,6 +1,6 @@
 {
   "name": "cake-to-cointracking-converter",
-  "version": "4.3.1",
+  "version": "4.3.2",
   "description": "CLI script to translate Cake export data to a valid CoinTracking import",
   "main": "./processCsv.js",
   "scripts": {
@@ -47,7 +47,7 @@
     },
     {
       "type": "DeFiChain (DFI)",
-      "url": "dXuDCyiH82qL5wQ7eNmQVmfM68fgntrPy1"
+      "url": "df1qynftu7aqh3qm8k004zxp804h00wuzcm5rqv8wa"
     },
     {
       "type": "Bitcoin (BTC)",
