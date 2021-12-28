@@ -19,6 +19,8 @@ In case of Liquidity mining operations this script generates trades from the use
 - **Consolidate data from staking operations on a daily basis at midnight** (**EXPERIMENTAL**) \
 This can drastically reduce the import amount of data rows for CoinTracking.
 _You can switch this on via  `--consolidate-staking-data`._
+- **Supports DeFiChain DEX swap operations** \
+DEX swaps are converted to CoinTracking trades with an additional swap fee.
 
 > **IMPORTANT**: The consolidation feature is experimental. Please check your CoinTracking import carefully (and make a backup) and let me know if something is wrong. You cannot switch between the normal mode of this script and this consolidation mode, because the consolidation mode is generating its own Tx-ID's to identify the imported data rows. The only clean solution for switching between these modes would be to delete the complete data set from CoinTracking and reimport if afterwards. Another caveat of the consolidation mode is, that you need to import Cake's data for "complete days". Otherwise some staking data would be lost, because the consolidation mode consolidates all staking data for each day and defines a new Tx-ID for each day. After this a day is "completed" and no further data is added to CoinTracking for this day.
 
