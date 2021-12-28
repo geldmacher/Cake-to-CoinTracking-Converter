@@ -71,11 +71,11 @@ cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\cointracking
 - Freezer liquidity mining bonus
 - Unstake fee
 - Bonus/Airdrop
-- Add liquidity XXX-YYY
-- Remove liquidity XXX-YYY
+- Add liquidity (d)X(X...)-YYY(Y)
+- Remove liquidity (d)X(X...)-YYY(Y)
 - Added liquidity
 - Removed liquidity
-- Liquidity mining reward XXX-YYY
+- Liquidity mining reward (d)X(X...)-YYY(Y)
 - Swapped in
 - Swapped out
 - Claimed for 50% discount

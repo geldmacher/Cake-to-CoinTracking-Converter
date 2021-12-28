@@ -175,8 +175,8 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 if(
                     row['Operation'] === 'Added liquidity' 
                     || row['Operation'] === 'Removed liquidity' 
-                    || /^Add liquidity [A-Z]{3,4}-[A-Z]{3}$/.test(row['Operation']) 
-                    || /^Remove liquidity [A-Z]{3,4}-[A-Z]{3}$/.test(row['Operation'])
+                    || /^Add liquidity (?:d)?[A-Z]+-[A-Z]{3,4}$/.test(row['Operation']) 
+                    || /^Remove liquidity (?:d)?[A-Z]+-[A-Z]{3,4}$/.test(row['Operation'])
                 ){
                     lmRecords.push(row);
                     notHandledOperation = '';
@@ -191,8 +191,8 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                     discountRecords.push(row);
                     notHandledOperation = '';
                 }
-                // Handle "Liquidity mining reward AAA(A)-BBB"
-                if(/^Liquidity mining reward [A-Z]{3,4}-[A-Z]{3}$/.test(row['Operation'])){
+                // Handle "Liquidity mining reward (d)A+-BBB(B)"
+                if(/^Liquidity mining reward (?:d)?[A-Z]+-[A-Z]{3,4}$/.test(row['Operation'])){
                     data['Type'] = (row['Coin/Asset'] === 'DFI' && !noAutoStakeRewards) ? translatedCtTypes.staking : translatedCtTypes.income;
                     data['Trade-Group'] = 'Liquidity Mining';
                     data['Buy Currency'] = row['Coin/Asset'];
