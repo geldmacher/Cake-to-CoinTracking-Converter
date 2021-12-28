@@ -73,7 +73,7 @@ const generateHoldingsOverview = (records) => {
         },
         columns: {
             0: { 
-                width: 10
+                width: 15
             },
             1: { 
                 width: 25

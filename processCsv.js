@@ -8,6 +8,7 @@ const chalk  = require('chalk');
 const { consolidateData } = require('./services/consolidateData');
 const { augmentLmRecords } = require('./services/augmentLmRecords');
 const { augmentSwapRecords } = require('./services/augmentSwapRecords');
+const { augmentDexSwapRecords } = require('./services/augmentDexSwapRecords');
 const { augmentDiscountRecords } = require('./services/augmentDiscountRecords');
 const { generateCtRecordsFromCakeDataRow } = require('./services/generateCtRecordsFromCakeDataRow');
 const { generateHoldingsOverview } = require('./services/generateHoldingsOverview');
@@ -84,6 +85,7 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
     let lmRecords = [];
     let swapRecords = [];
     let discountRecords = [];
+    let dexSwapRecords = [];
 
     progressBar.start(1, 0);
 
@@ -125,8 +127,13 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
                 discountRecords = [...discountRecords, ...handledRecords[4]];
                 progressBar.increment(handledRecords[4].length);
             }
+            // DEX swap records
+            if (handledRecords[5].length > 0) {
+                dexSwapRecords = [...dexSwapRecords, ...handledRecords[5]];
+                progressBar.increment(handledRecords[5].length);
+            }
 
-            progressBar.setTotal(records.length + skippedRecords.length + lmRecords.length + swapRecords.length + discountRecords.length);
+            progressBar.setTotal(records.length + skippedRecords.length + lmRecords.length + swapRecords.length + discountRecords.length + dexSwapRecords.length);
             progressBar.updateETA();
         })
         .on('error', error => {
@@ -140,17 +147,6 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
                 records = consolidateData(records, translatedCtTypes, useCtFiatValuation);
             }
 
-            // Handle LM records
-            if(lmRecords.length > 0){
-                const augmentedLmRecords = augmentLmRecords(lmRecords);
-                augmentedLmRecords.forEach(augmentedLmRecord => {
-                    handledRecords = generateCtRecordsFromCakeDataRow(augmentedLmRecord, translatedCtTypes, useCtFiatValuation);
-                    if (handledRecords[0].length > 0) {
-                        records = [...records, ...handledRecords[0]];
-                    } 
-                });
-            }
-
             // Handle Swap records
             if(swapRecords.length > 0){
                 const augmentedSwapRecords = augmentSwapRecords(swapRecords);
@@ -162,11 +158,33 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
                 });
             }
 
+            // Handle DEX Swap records
+            if(dexSwapRecords.length > 0){
+                const augmentedDexSwapRecords = augmentDexSwapRecords(dexSwapRecords);
+                augmentedDexSwapRecords.forEach(augmentedDexSwapRecord => {
+                    handledRecords = generateCtRecordsFromCakeDataRow(augmentedDexSwapRecord, translatedCtTypes, useCtFiatValuation);
+                    if (handledRecords[0].length > 0) {
+                        records = [...records, ...handledRecords[0]];
+                    } 
+                });
+            }
+
             // Handle Discount records
             if(discountRecords.length > 0){
                 const augmentedDiscountRecords = augmentDiscountRecords(discountRecords);
                 augmentedDiscountRecords.forEach(augmentedDiscountRecord => {
                     handledRecords = generateCtRecordsFromCakeDataRow(augmentedDiscountRecord, translatedCtTypes, useCtFiatValuation);
+                    if (handledRecords[0].length > 0) {
+                        records = [...records, ...handledRecords[0]];
+                    } 
+                });
+            }
+
+            // Handle LM records
+            if(lmRecords.length > 0){
+                const augmentedLmRecords = augmentLmRecords(lmRecords);
+                augmentedLmRecords.forEach(augmentedLmRecord => {
+                    handledRecords = generateCtRecordsFromCakeDataRow(augmentedLmRecord, translatedCtTypes, useCtFiatValuation);
                     if (handledRecords[0].length > 0) {
                         records = [...records, ...handledRecords[0]];
                     } 

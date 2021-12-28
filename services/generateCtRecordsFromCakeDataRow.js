@@ -20,6 +20,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
     const lmRecords = [];
     const swapRecords = [];
     const discountRecords = [];
+    const dexSwapRecords = [];
 
     try {
         const data = {
@@ -67,6 +68,23 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 data['Sell Amount'] = row['Sell Amount'].replace('-','');
                 data['Sell Value in your Account Currency'] = useCtFiatValuation ? row['Sell FIAT value'].replace('-','') : '';
                 break;
+            case 'Swap trade (DeFiChain DEX)': // Custom operation (@see ./augmentDexSwapRecords.js)
+                data['Type'] = translatedCtTypes.trade;
+                data['Trade-Group'] = 'Swap';
+                data['Buy Currency'] = row['Buy Coin/Asset'];
+                data['Buy Amount'] = row['Buy Amount'].replace('-','');
+                data['Buy Value in your Account Currency'] = useCtFiatValuation ? row['Buy FIAT value'].replace('-','') : '';
+                data['Sell Currency'] = row['Sell Coin/Asset'];
+                data['Sell Amount'] = row['Sell Amount'].replace('-','');
+                data['Sell Value in your Account Currency'] = useCtFiatValuation ? row['Sell FIAT value'].replace('-','') : '';
+                break;
+            case 'Swap trade fee (DeFiChain DEX)': // Custom operation (@see ./augmentDexSwapRecords.js)
+                data['Type'] = translatedCtTypes.other_fee;
+                data['Trade-Group'] = 'Swap';
+                data['Sell Currency'] = row['Sell Coin/Asset'];
+                data['Sell Amount'] = row['Sell Amount'].replace('-','');
+                data['Sell Value in your Account Currency'] = useCtFiatValuation ? row['Sell FIAT value'].replace('-','') : '';
+                break;
             case 'Discount trade': // Custom operation (@see ./augmentDiscountRecords.js)
                 data['Type'] = translatedCtTypes.trade;
                 data['Trade-Group'] = 'Discount';
@@ -78,17 +96,17 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 data['Sell Value in your Account Currency'] = useCtFiatValuation ? row['Sell FIAT value'].replace('-','') : '';
                 break;    
             case 'Deposit':
-                // Deposit operations with a reference ID are handled via DefiChain DEX and not fully integrated in the Cake export data
-                // Swap withdrawel and paid swap fee are marked as "unknown" operation
+                // Deposit operations with a reference ID are handled via DeFiChain DEX
+                // Swap withdrawel and paid swap fee are part of this operation
                 if(row['Related reference ID'] && row['Related reference ID'].length > 0){
-                    row['_error'] = 'DefiChain DEX operations (like Swaps) are not traversable right now, because some related data is incomplete in the Cake export (Swap withdrawel and paid swap fee are marked as "unknown" operation). See this issue: https://github.com/geldmacher/Cake-to-CoinTracking-Converter/issues/10';
-                    skippedRecords.push(row);
+                    dexSwapRecords.push(row);
+                } else {
+                    data['Type'] = translatedCtTypes.deposit;
+                    data['Trade-Group'] = 'Deposit';
+                    data['Buy Currency'] = row['Coin/Asset'];
+                    data['Buy Amount'] = row['Amount'].replace('-','');
+                    data['Buy Value in your Account Currency'] = useCtFiatValuation ? '' : row['FIAT value'].replace('-','');
                 }
-                data['Type'] = translatedCtTypes.deposit;
-                data['Trade-Group'] = 'Deposit';
-                data['Buy Currency'] = row['Coin/Asset'];
-                data['Buy Amount'] = row['Amount'].replace('-','');
-                data['Buy Value in your Account Currency'] = useCtFiatValuation ? '' : row['FIAT value'].replace('-','');
                 break;
             case 'Withdrawal': 
                 data['Type'] = translatedCtTypes.withdrawal;
@@ -186,6 +204,13 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                     swapRecords.push(row);
                     notHandledOperation = '';
                 }
+                // Preserve DEX swap related rows which are related to each other and transfer their data to another handling mechanism
+                // Atm DEX swap operations consists out of 3 seperate operations
+                // One is marked as a normal Deposit, the other 2 are "Unknown" (Withdrawel + Fee)
+                if(row['Operation'] === 'Unknown' && row['Related reference ID'] && row['Related reference ID'].length > 0){
+                    dexSwapRecords.push(row);
+                    notHandledOperation = '';
+                }
                 // Preserve discount related rows which are related to each other and transfer their data to another handling mechanism
                 if(row['Operation'] === 'Claimed for 50% discount' || row['Operation'] === 'Used for 50% discount'){
                     discountRecords.push(row);
@@ -216,7 +241,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
         skippedRecords.push(row);
     }
     
-    return [records, skippedRecords, lmRecords, swapRecords, discountRecords];
+    return [records, skippedRecords, lmRecords, swapRecords, discountRecords, dexSwapRecords];
 }
 
 module.exports.generateCtRecordsFromCakeDataRow = generateCtRecordsFromCakeDataRow;

@@ -64,7 +64,6 @@ const augmentLmRecords = (lmRecords) => {
             augmentedLmRecords.push(augmentedLmRecord);
         });
     });
-
     return augmentedLmRecords;
 }
 
