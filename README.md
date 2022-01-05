@@ -10,7 +10,9 @@ CLI script to translate [Cake](https://app.cakedefi.com/#?ref=401824) export dat
 - **Supports german and english CoinTracking import** \
 English is used by default.
 - **Displays simple overview of current holdings at cake** \
-The overview is displayed in the CLI after script execution. You need the export data of your complete Cake usage time. Otherwise this overview is nonsense.
+This overview is displayed in the CLI after script execution. You need the export data of your complete Cake usage time. Otherwise this overview is nonsense.
+- **Displays simple overview of monthly income at cake.** \
+This overview is displayed in the CLI after script execution.
 - **Uses Cake's FIAT valuation for each transaction in your chosen export currency instead of the CoinTracking valuation data** \
 Keep in mind that your CoinTracking account currency should match your exported transaction valutation currency from Cake.
 _This feature can be disabled via `--use-cointracking-fiat-valuation`. The CoinTracking data is than used._
@@ -53,6 +55,7 @@ cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\cointracking
 - `--consolidate-staking-data` (optional) - Consolidate data from staking operations on a daily basis at midnight.
 - `--use-cointracking-fiat-valuation` (optional) - Use the FIAT transaction valuation from CoinTracking instead of the valuation data from Cake.
 - `--no-auto-stake-rewards` (optional) - Stakable rewards are signed as normal incomes. By default they are signed as staking income.
+- `--display-income-overview` (optional) - Displays simple overview of monthly income at cake.
 
 ## Supported Cake operations
 

@@ -13,6 +13,7 @@ const { augmentDiscountRecords } = require('./services/augmentDiscountRecords');
 const { generateCtRecordsFromCakeDataRow } = require('./services/generateCtRecordsFromCakeDataRow');
 const { generateHoldingsOverview } = require('./services/generateHoldingsOverview');
 const { generateErrorDetailsOverview } = require('./services/generateErrorDetailsOverview');
+const { generateIncomeOverview } = require('./services/generateIncomeOverview');
 
 // CoinTracking type fields need to be in the language of your CoinTracking UI
 const ctType = {
@@ -60,8 +61,9 @@ const ctType = {
  * @param {*} consolidateStakingData 
  * @param {*} displayHoldingsOverview 
  * @param {*} noAutoStakeRewards 
+ * @param {*} displayIncomeOverview 
  */
-const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consolidateStakingData, displayHoldingsOverview, noAutoStakeRewards) => {
+const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consolidateStakingData, displayHoldingsOverview, noAutoStakeRewards, displayIncomeOverview) => {
 
     // EN is the default language
     const normalizedLanguage = (language.length > 0) ? language.toLowerCase() : 'en';
@@ -197,6 +199,12 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
                 holdings = generateHoldingsOverview(records);
             }
 
+            // Output income
+            let income;
+            if(displayIncomeOverview){
+                income = generateIncomeOverview(records);
+            }
+
             // Build CoinTracking CSV file
             stringify(records, {
                 header: true,
@@ -214,6 +222,10 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
                                 console.error('\n' + chalk.bold(chalk.red(error)) + '\n');
                             } else {
                                 console.info('\n' + chalk.bold(chalk.green('Done! Wrote Cake data to CoinTracking file.')));
+                                if(displayIncomeOverview){
+                                    console.info('\n' + chalk.underline(chalk.bold('Your monthly income at Cake:')));
+                                    console.log('\n' + income + '\n');
+                                }
                                 if(displayHoldingsOverview){
                                     console.info('\n' + chalk.underline(chalk.bold('Your current holdings at Cake:')));
                                     console.log('\n' + holdings + '\n');
