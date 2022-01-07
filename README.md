@@ -37,7 +37,7 @@ npm install -g cake-to-cointracking-converter
 
 ## Usage
 
-1. Get your [Cake transactions export](https://app.cakedefi.com/transactions)(CSV) for all coins and generate a CoinTracking import via CLI.
+1. Get your [Cake transactions export](https://app.cakedefi.com/transactions) (CSV) for all coins and generate a CoinTracking import via CLI.
 
 2. Example CLI command (More [options](#options) below): 
 ```shell 
