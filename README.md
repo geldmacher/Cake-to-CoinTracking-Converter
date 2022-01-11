@@ -29,7 +29,7 @@ DEX swaps are converted to CoinTracking trades with an additional swap fee.
 ## Installation
 
 1) [Node.js](https://nodejs.org/) is required to run this script. Just download and install the current LTS version.
-2) Install it with your via npm CLI (Bundled with Node.js):
+2) Install it via npm CLI (Bundled with Node.js):
 
 ```shell
 npm install -g cake-to-cointracking-converter
