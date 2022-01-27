@@ -7,8 +7,8 @@ Decimal.set({
 
 /**
  * Augment DEX Swap records
- * 
- * @param {*} dexSwapRecords 
+ *
+ * @param {*} dexSwapRecords
  */
 const augmentDexSwapRecords = (dexSwapRecords) => {
 
@@ -25,7 +25,7 @@ const augmentDexSwapRecords = (dexSwapRecords) => {
             });
         }
     });
-    
+
     const augmentedDexSwapRecords = [];
     sortedDexSwapRecords.forEach(sortedDexSwapRecord => {
         const augmentedDexSwapRecord = {
@@ -40,21 +40,20 @@ const augmentDexSwapRecords = (dexSwapRecords) => {
                     augmentedDexSwapRecord['Buy Coin/Asset'] = sortedDexSwapRecordRef['Coin/Asset'];
                     augmentedDexSwapRecord['Buy FIAT value'] = sortedDexSwapRecordRef['FIAT value'];
                     break;
-                case 'Unknown':
-                    if(sortedDexSwapRecordRef['Transaction ID']){
-                        augmentedDexSwapRecord['Sell Amount'] = sortedDexSwapRecordRef['Amount'];
-                        augmentedDexSwapRecord['Sell Coin/Asset'] = sortedDexSwapRecordRef['Coin/Asset'];
-                        augmentedDexSwapRecord['Sell FIAT value'] = sortedDexSwapRecordRef['FIAT value'];
-                    } else {
-                        augmentedDexSwapRecords.push({
-                            'Date': sortedDexSwapRecordRef['Date'],
-                            'Operation': 'Swap trade fee (DeFiChain DEX)',
-                            'Reference': sortedDexSwapRecordRef['Reference'],
-                            'Sell Amount': sortedDexSwapRecordRef['Amount'],
-                            'Sell Coin/Asset': sortedDexSwapRecordRef['Coin/Asset'],
-                            'Sell FIAT value': sortedDexSwapRecordRef['FIAT value']
-                        });
-                    }
+                case 'Withdrew for swap':
+                    augmentedDexSwapRecord['Sell Amount'] = sortedDexSwapRecordRef['Amount'];
+                    augmentedDexSwapRecord['Sell Coin/Asset'] = sortedDexSwapRecordRef['Coin/Asset'];
+                    augmentedDexSwapRecord['Sell FIAT value'] = sortedDexSwapRecordRef['FIAT value'];
+                    break;
+                case 'Paid swap fee':
+                    augmentedDexSwapRecords.push({
+                        'Date': sortedDexSwapRecordRef['Date'],
+                        'Operation': 'Swap trade fee (DeFiChain DEX)',
+                        'Reference': sortedDexSwapRecordRef['Reference'],
+                        'Sell Amount': sortedDexSwapRecordRef['Amount'],
+                        'Sell Coin/Asset': sortedDexSwapRecordRef['Coin/Asset'],
+                        'Sell FIAT value': sortedDexSwapRecordRef['FIAT value']
+                    });
                     break;
             }
         });

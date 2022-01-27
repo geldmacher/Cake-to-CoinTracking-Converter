@@ -7,11 +7,11 @@ Decimal.set({
 
 /**
  * Translate Cake records to CoinTracking records
- * 
- * @param {*} row  
- * @param {*} translatedCtTypes 
- * @param {*} useCtFiatValuation  
- * @param {*} noAutoStakeRewards  
+ *
+ * @param {*} row
+ * @param {*} translatedCtTypes
+ * @param {*} useCtFiatValuation
+ * @param {*} noAutoStakeRewards
  */
 const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValuation, noAutoStakeRewards) => {
 
@@ -94,10 +94,10 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 data['Sell Currency'] = row['Sell Coin/Asset'];
                 data['Sell Amount'] = row['Sell Amount'].replace('-','');
                 data['Sell Value in your Account Currency'] = useCtFiatValuation ? row['Sell FIAT value'].replace('-','') : '';
-                break;    
+                break;
             case 'Deposit':
                 // Deposit operations with a reference ID are handled via DeFiChain DEX
-                // Swap withdrawel and paid swap fee are part of this operation
+                // Swap withdrawel and paid swap fee are part of this operation. See "Withdrew for swap" and "Paid swap fee".
                 if(row['Related reference ID'] && row['Related reference ID'].length > 0){
                     dexSwapRecords.push(row);
                 } else {
@@ -108,7 +108,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                     data['Buy Value in your Account Currency'] = useCtFiatValuation ? '' : row['FIAT value'].replace('-','');
                 }
                 break;
-            case 'Withdrawal': 
+            case 'Withdrawal':
                 data['Type'] = translatedCtTypes.withdrawal;
                 data['Trade-Group'] = 'Withdrawal';
                 data['Sell Currency'] = row['Coin/Asset'];
@@ -132,6 +132,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 break;
             case 'Lapis DFI Bonus':
             case 'Lending DFI Bonus':
+            case 'Entry staking wallet: Lending DFI Bonus':
             case 'Confectionery Lending DFI Bonus':
                 data['Type'] = translatedCtTypes.interest_income;
                 data['Trade-Group'] = 'Lending';
@@ -144,6 +145,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
             case '10 years freezer reward':
             case 'Freezer staking bonus':
             case 'Freezer promotion bonus':
+            case 'Entry staking wallet: Freezer promotion bonus':
                 data['Type'] = translatedCtTypes.staking;
                 data['Trade-Group'] = 'Staking';
                 data['Buy Currency'] = row['Coin/Asset'];
@@ -151,6 +153,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 data['Buy Value in your Account Currency'] = useCtFiatValuation ? '' : row['FIAT value'].replace('-','');
                 break;
             case 'Unstake fee':
+            case 'Exit staking wallet fee':
                 data['Type'] = translatedCtTypes.other_fee;
                 data['Trade-Group'] = 'Staking';
                 data['Sell Currency'] = row['Coin/Asset'];
@@ -158,6 +161,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 data['Sell Value in your Account Currency'] = useCtFiatValuation ? '' : row['FIAT value'].replace('-','');
                 break;
             case 'Bonus/Airdrop':
+            case 'Entry staking wallet: Bonus/Airdrop':
                 data['Type'] = translatedCtTypes.airdrop;
                 data['Trade-Group'] = 'Bonus/Airdrop';
                 data['Buy Currency'] = row['Coin/Asset'];
@@ -168,19 +172,20 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
             case 'Referral signup bonus':
             case 'Signup bonus':
             case 'Promotion bonus':
+            case 'Entry staking wallet: Referral signup bonus':
                 data['Type'] = translatedCtTypes.income;
                 data['Trade-Group'] = 'Referral';
                 data['Buy Currency'] = row['Coin/Asset'];
                 data['Buy Amount'] = row['Amount'].replace('-','');
                 data['Buy Value in your Account Currency'] = useCtFiatValuation ? '' : row['FIAT value'].replace('-','');
-                break;        
+                break;
             default:
                 let notHandledOperation = row['Operation'];
                 // Preserve LM related rows which are related to each other and transfer their data to another handling mechanism
                 if(
-                    row['Operation'] === 'Added liquidity' 
-                    || row['Operation'] === 'Removed liquidity' 
-                    || /^Add liquidity (?:d)?[A-Z]+-[A-Z]{3,4}$/.test(row['Operation']) 
+                    row['Operation'] === 'Added liquidity'
+                    || row['Operation'] === 'Removed liquidity'
+                    || /^Add liquidity (?:d)?[A-Z]+-[A-Z]{3,4}$/.test(row['Operation'])
                     || /^Remove liquidity (?:d)?[A-Z]+-[A-Z]{3,4}$/.test(row['Operation'])
                 ){
                     lmRecords.push(row);
@@ -193,8 +198,8 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 }
                 // Preserve DEX swap related rows which are related to each other and transfer their data to another handling mechanism
                 // Atm DEX swap operations consists out of 3 seperate operations
-                // One is marked as a normal Deposit, the other 2 are "Unknown" (Withdrawel + Fee)
-                if(row['Operation'] === 'Unknown' && row['Related reference ID'] && row['Related reference ID'].length > 0){
+                // One is marked as a normal Deposit, the other 2 are "Withdrew for swap" and "Paid swap fee"
+                if (row['Operation'] === 'Withdrew for swap' || row['Operation'] === 'Paid swap fee') {
                     dexSwapRecords.push(row);
                     notHandledOperation = '';
                 }
@@ -227,7 +232,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
         row['_error'] = error;
         skippedRecords.push(row);
     }
-    
+
     return [records, skippedRecords, lmRecords, swapRecords, discountRecords, dexSwapRecords];
 }
 

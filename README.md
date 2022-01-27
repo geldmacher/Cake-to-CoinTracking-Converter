@@ -39,8 +39,8 @@ npm install -g cake-to-cointracking-converter
 
 1. Get your [Cake transactions export](https://app.cakedefi.com/transactions)(CSV) for all coins and generate a CoinTracking import via CLI.
 
-2. Example CLI command (More [options](#options) below): 
-```shell 
+2. Example CLI command (More [options](#options) below):
+```shell
 cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\cointracking-import-file.csv" --language "DE"
 ```
 
@@ -59,23 +59,29 @@ cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\cointracking
 
 ## Supported Cake operations
 
-- Deposit
+- Deposit (incl. DEX deposit)
 - Withdrawal
+- Withdrew for swap
 - Withdrawal fee
+- Paid swap fee
 - Referral reward
 - Referral signup bonus
+- Entry staking wallet: Referral signup bonus
 - Promotion bonus
 - Lending reward
 - Lending DFI Bonus
+- Entry staking wallet: Lending DFI Bonus
 - Confectionery Lending DFI Bonus
 - Staking reward
 - 5 years freezer reward
 - 10 years freezer reward
 - Freezer promotion bonus
+- Entry staking wallet: Freezer promotion bonus
 - Freezer staking bonus
 - Freezer liquidity mining bonus
 - Unstake fee
 - Bonus/Airdrop
+- Entry staking wallet: Bonus/Airdrop
 - Add liquidity (d)X(X...)-YYY(Y)
 - Remove liquidity (d)X(X...)-YYY(Y)
 - Added liquidity
