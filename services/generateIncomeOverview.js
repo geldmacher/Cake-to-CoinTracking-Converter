@@ -4,7 +4,7 @@ const Decimal = require('decimal.js');
 const { v5: uuidv5 } = require('uuid');
 
 // Allow extreme small numbers with exponential notation
-Decimal.set({ 
+Decimal.set({
     toExpNeg: -9e15
  });
 
@@ -13,8 +13,8 @@ const stats = new Map();
 
 /**
  * Update stats map
- * 
- * @param {*} record 
+ *
+ * @param {*} record
  */
 const updateStats = (record) => {
     // Generate own uuid to identify record groups
@@ -43,7 +43,11 @@ const updateStats = (record) => {
         case 'Referral reward':
         case 'Referral signup bonus':
         case 'Signup bonus':
-        case 'Promotion bonus':   
+        case 'Promotion bonus':
+        case 'Entry staking wallet: Referral signup bonus':
+        case 'Entry staking wallet: Bonus/Airdrop':
+        case 'Entry staking wallet: Freezer promotion bonus':
+        case 'Entry staking wallet: Lending DFI Bonus':
             hasProducedIncome = true;
         break;
         default:
@@ -80,8 +84,8 @@ const updateStats = (record) => {
 
 /**
  * Generate monthly income overview output
- * 
- * @param {*} records 
+ *
+ * @param {*} records
  */
 const generateIncomeOverview = (records) => {
 
@@ -107,19 +111,19 @@ const generateIncomeOverview = (records) => {
             width: 30
         },
         columns: {
-            0: { 
+            0: {
                 width: 5
             },
-            1: { 
+            1: {
                 width: 5
             },
-            2: { 
+            2: {
                 width: 15
             },
-            3: { 
+            3: {
                 width: 25
             },
-            43: { 
+            43: {
                 width: 35
             }
           }
