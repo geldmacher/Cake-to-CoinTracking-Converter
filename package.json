@@ -1,6 +1,6 @@
 {
   "name": "cake-to-cointracking-converter",
-  "version": "4.7.1",
+  "version": "5.0.0",
   "description": "CLI script to translate Cake export data to a valid CoinTracking import",
   "main": "./processCsv.js",
   "scripts": {
@@ -32,13 +32,13 @@
   "homepage": "https://github.com/geldmacher/Cake-to-CoinTracking-Converter#readme",
   "dependencies": {
     "chalk": "^4.1.2",
-    "cli-progress": "^3.9.0",
+    "cli-progress": "^3.10.0",
     "csv-parser": "^3.0.0",
     "csv-stringify": "^5.6.5",
     "decimal.js": "^10.3.1",
-    "table": "^6.7.1",
+    "table": "^6.8.0",
     "uuid": "^8.3.2",
-    "yargs": "^17.1.1"
+    "yargs": "^17.3.1"
   },
   "funding": [
     {

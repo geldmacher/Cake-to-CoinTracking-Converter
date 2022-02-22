@@ -5,9 +5,9 @@ const yargs = require('yargs');
 const { hideBin } = require('yargs/helpers');
 
 const argv = yargs(hideBin(process.argv))
-    .usage('Usage: cake2ct --cake-csv [path] --ct-csv [path] --language [XY] --display-holdings-overview --consolidate-staking-data --use-cointracking-fiat-valuation --no-auto-stake-rewards --display-income-overview')
+    .usage('Usage: cake2ct --cake-csv [path] --ct-csv [path] --language [XY] --display-holdings-overview --consolidate-staking-data --use-cointracking-fiat-valuation --display-income-overview')
     .demandOption([
-        'cake-csv', 
+        'cake-csv',
         'ct-csv'
     ])
     .describe('cake-csv', 'Path to Cake CSV.')
@@ -19,10 +19,8 @@ const argv = yargs(hideBin(process.argv))
     .describe('consolidate-staking-data', 'Consolidate data from staking operations on a daily basis at midnight.')
     .boolean('use-cointracking-fiat-valuation')
     .describe('use-cointracking-fiat-valuation', 'Use the FIAT transaction valuation from CoinTracking instead of the valuation data from Cake.')
-    .boolean('no-auto-stake-rewards')
-    .describe('no-auto-stake-rewards', 'Stakable rewards are signed as normal incomes. By default they are signed as staking income. (Liquidity Mining and Staking)')
     .boolean('display-income-overview')
     .describe('display-income-overview', 'Displays simple overview of monthly income at cake.')
     .argv;
 
-processCsv(argv['cake-csv'], argv['ct-csv'], argv['language'], argv['use-cointracking-fiat-valuation'], argv['consolidate-staking-data'], argv['display-holdings-overview'], argv['no-auto-stake-rewards'], argv['display-income-overview']);
+processCsv(argv['cake-csv'], argv['ct-csv'], argv['language'], argv['use-cointracking-fiat-valuation'], argv['consolidate-staking-data'], argv['display-holdings-overview'], argv['display-income-overview']);

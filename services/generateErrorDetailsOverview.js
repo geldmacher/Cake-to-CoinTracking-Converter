@@ -3,8 +3,8 @@ const chalk  = require('chalk');
 
 /**
  * Generate error details output
- * 
- * @param {*} records 
+ *
+ * @param {*} records
  */
 const generateErrorDetailsOverview = (records) => {
 
@@ -26,7 +26,7 @@ const generateErrorDetailsOverview = (records) => {
                 record['_error']
             ];
             errorDetails.set(record['Reference'], data);
-        } 
+        }
     });
 
     // Table output
@@ -36,10 +36,10 @@ const generateErrorDetailsOverview = (records) => {
             width: 50
         },
         columns: {
-            0: { 
+            0: {
                 width: 40
             },
-            1: { 
+            1: {
                 width: 70
             }
           }

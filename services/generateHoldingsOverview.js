@@ -4,7 +4,7 @@ const Decimal = require('decimal.js');
 const { v5: uuidv5 } = require('uuid');
 
 // Allow extreme small numbers with exponential notation
-Decimal.set({ 
+Decimal.set({
     toExpNeg: -9e15
  });
 
@@ -13,9 +13,9 @@ const stats = new Map();
 
 /**
  * Update stats map
- * 
- * @param {*} record 
- * @param {*} isSell 
+ *
+ * @param {*} record
+ * @param {*} isSell
  */
 const updateStats = (record, isSell) => {
     // Generate own uuid to identify record groups
@@ -42,8 +42,8 @@ const updateStats = (record, isSell) => {
 
 /**
  * Generate import result data output
- * 
- * @param {*} records 
+ *
+ * @param {*} records
  */
 const generateHoldingsOverview = (records) => {
 
@@ -72,10 +72,10 @@ const generateHoldingsOverview = (records) => {
             width: 30
         },
         columns: {
-            0: { 
+            0: {
                 width: 15
             },
-            1: { 
+            1: {
                 width: 25
             }
           }

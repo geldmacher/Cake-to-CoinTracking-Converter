@@ -3,7 +3,7 @@ const path = require('path');
 const csv = require('csv-parser');
 const stringify = require('csv-stringify');
 const cliProgress = require('cli-progress');
-const chalk  = require('chalk');
+const chalk = require('chalk');
 
 const { consolidateData } = require('./services/consolidateData');
 const { augmentLmRecords } = require('./services/augmentLmRecords');
@@ -23,6 +23,7 @@ const ctType = {
         withdrawal: 'Auszahlung',
         lending_income: 'Lending Einnahme',
         interest_income: 'Zinsen',
+        reward_income: 'Belohnung / Bonus',
         staking: 'Staking',
         other_fee: 'Sonstige Gebühr',
         airdrop: 'Airdrop',
@@ -39,6 +40,7 @@ const ctType = {
         withdrawal: 'Withdrawal',
         lending_income: 'Lending Income',
         interest_income: 'Interest Income',
+        reward_income: 'Reward / Bonus',
         staking: 'Staking',
         other_fee: 'Other Fee',
         airdrop: 'Airdrop',
@@ -53,17 +55,16 @@ const ctType = {
 
 /**
  * Process the Cake CSV export and generate the CoinTracking CSV import
- * 
- * @param {*} cakeCsvPath 
- * @param {*} ctCsvPath 
- * @param {*} language 
- * @param {*} useCtFiatValuation 
- * @param {*} consolidateStakingData 
- * @param {*} displayHoldingsOverview 
- * @param {*} noAutoStakeRewards 
- * @param {*} displayIncomeOverview 
+ *
+ * @param {*} cakeCsvPath
+ * @param {*} ctCsvPath
+ * @param {*} language
+ * @param {*} useCtFiatValuation
+ * @param {*} consolidateStakingData
+ * @param {*} displayHoldingsOverview
+ * @param {*} displayIncomeOverview
  */
-const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consolidateStakingData, displayHoldingsOverview, noAutoStakeRewards, displayIncomeOverview) => {
+const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consolidateStakingData, displayHoldingsOverview, displayIncomeOverview) => {
 
     // EN is the default language
     const normalizedLanguage = (language.length > 0) ? language.toLowerCase() : 'en';
@@ -102,13 +103,13 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
             console.error('\n' + chalk.bold(chalk.red(error)) + '\n');
         })
         .on('data', row => {
-            handledRecords = generateCtRecordsFromCakeDataRow(row, translatedCtTypes, useCtFiatValuation, noAutoStakeRewards);
+            handledRecords = generateCtRecordsFromCakeDataRow(row, translatedCtTypes, useCtFiatValuation);
 
             // Normal records
             if (handledRecords[0].length > 0) {
                 records = [...records, ...handledRecords[0]];
                 progressBar.increment(handledRecords[0].length);
-            } 
+            }
             // Skipped records
             if (handledRecords[1].length > 0) {
                 skippedRecords = [...skippedRecords, ...handledRecords[1]];
@@ -156,7 +157,7 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
                     handledRecords = generateCtRecordsFromCakeDataRow(augmentedSwapRecord, translatedCtTypes, useCtFiatValuation);
                     if (handledRecords[0].length > 0) {
                         records = [...records, ...handledRecords[0]];
-                    } 
+                    }
                 });
             }
 
@@ -167,7 +168,7 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
                     handledRecords = generateCtRecordsFromCakeDataRow(augmentedDexSwapRecord, translatedCtTypes, useCtFiatValuation);
                     if (handledRecords[0].length > 0) {
                         records = [...records, ...handledRecords[0]];
-                    } 
+                    }
                 });
             }
 
@@ -178,7 +179,7 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
                     handledRecords = generateCtRecordsFromCakeDataRow(augmentedDiscountRecord, translatedCtTypes, useCtFiatValuation);
                     if (handledRecords[0].length > 0) {
                         records = [...records, ...handledRecords[0]];
-                    } 
+                    }
                 });
             }
 
@@ -189,7 +190,7 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
                     handledRecords = generateCtRecordsFromCakeDataRow(augmentedLmRecord, translatedCtTypes, useCtFiatValuation);
                     if (handledRecords[0].length > 0) {
                         records = [...records, ...handledRecords[0]];
-                    } 
+                    }
                 });
             }
 
@@ -230,7 +231,7 @@ const processCsv = (cakeCsvPath, ctCsvPath, language, useCtFiatValuation, consol
                                     console.info('\n' + chalk.underline(chalk.bold('Your current holdings at Cake:')));
                                     console.log('\n' + holdings + '\n');
                                 }
-                                
+
                                 // Any skipped records?
                                 if(skippedRecords.length > 0){
                                     console.info(chalk.underline(chalk.bold(chalk.yellow('Some data rows where skipped:'))));

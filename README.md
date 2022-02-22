@@ -54,7 +54,6 @@ cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\cointracking
 - `--display-holdings-overview` (optional) - Displays simple overview of current holdings at cake. You need the export data of your complete Cake usage time. Otherwise this overview is nonsense.
 - `--consolidate-staking-data` (optional) - Consolidate data from staking operations on a daily basis at midnight.
 - `--use-cointracking-fiat-valuation` (optional) - Use the FIAT transaction valuation from CoinTracking instead of the valuation data from Cake.
-- `--no-auto-stake-rewards` (optional) - Stakable rewards are signed as normal incomes. By default they are signed as staking income.
 - `--display-income-overview` (optional) - Displays simple overview of monthly income at cake.
 
 ## Supported Cake operations
@@ -64,6 +63,8 @@ cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\cointracking
 - Withdrew for swap
 - Withdrawal fee
 - Paid swap fee
+- Entry staking wallet
+- Exit staking wallet
 - Referral reward
 - Referral signup bonus
 - Entry staking wallet: Referral signup bonus

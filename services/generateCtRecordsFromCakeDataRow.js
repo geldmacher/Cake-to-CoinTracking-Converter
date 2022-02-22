@@ -11,9 +11,8 @@ Decimal.set({
  * @param {*} row
  * @param {*} translatedCtTypes
  * @param {*} useCtFiatValuation
- * @param {*} noAutoStakeRewards
  */
-const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValuation, noAutoStakeRewards) => {
+const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValuation) => {
 
     const records = [];
     const skippedRecords = [];
@@ -52,7 +51,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 data['Sell Value in your Account Currency'] = useCtFiatValuation ? row['Sell FIAT value'].replace('-','') : '';
                 break;
             case 'Freezer liquidity mining bonus':
-                data['Type'] = (row['Coin/Asset'] === 'DFI' && !noAutoStakeRewards) ? translatedCtTypes.staking : translatedCtTypes.income;
+                data['Type'] = translatedCtTypes.income;
                 data['Trade-Group'] = 'Liquidity Mining';
                 data['Buy Currency'] = row['Coin/Asset'];
                 data['Buy Amount'] = row['Amount'].replace('-','');
@@ -124,17 +123,11 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 break;
             case 'Lapis reward':
             case 'Lending reward':
-                data['Type'] = translatedCtTypes.lending_income;
-                data['Trade-Group'] = 'Lending';
-                data['Buy Currency'] = row['Coin/Asset'];
-                data['Buy Amount'] = row['Amount'].replace('-','');
-                data['Buy Value in your Account Currency'] = useCtFiatValuation ? '' : row['FIAT value'].replace('-','');
-                break;
             case 'Lapis DFI Bonus':
             case 'Lending DFI Bonus':
             case 'Entry staking wallet: Lending DFI Bonus':
             case 'Confectionery Lending DFI Bonus':
-                data['Type'] = translatedCtTypes.interest_income;
+                data['Type'] = translatedCtTypes.lending_income;
                 data['Trade-Group'] = 'Lending';
                 data['Buy Currency'] = row['Coin/Asset'];
                 data['Buy Amount'] = row['Amount'].replace('-','');
@@ -144,8 +137,6 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
             case '5 years freezer reward':
             case '10 years freezer reward':
             case 'Freezer staking bonus':
-            case 'Freezer promotion bonus':
-            case 'Entry staking wallet: Freezer promotion bonus':
                 data['Type'] = translatedCtTypes.staking;
                 data['Trade-Group'] = 'Staking';
                 data['Buy Currency'] = row['Coin/Asset'];
@@ -173,6 +164,8 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
             case 'Signup bonus':
             case 'Promotion bonus':
             case 'Entry staking wallet: Referral signup bonus':
+            case 'Freezer promotion bonus':
+            case 'Entry staking wallet: Freezer promotion bonus':
                 data['Type'] = translatedCtTypes.income;
                 data['Trade-Group'] = 'Referral';
                 data['Buy Currency'] = row['Coin/Asset'];
@@ -181,6 +174,13 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 break;
             default:
                 let notHandledOperation = row['Operation'];
+                // Temprary exclude this operations from handling
+                // It seems like this operation 'Entry staking wallet' is the ngetaiv counterpart to all staking related income operations
+                // 'Exit staking wallet' is triggred when coins are unstaked
+                // This might be usefull for a tax related "virtual" separation of staking and non-staking wallets
+                if (row['Operation'] === 'Entry staking wallet' || row['Operation'] === 'Exit staking wallet') {
+                    notHandledOperation = '';
+                }
                 // Preserve LM related rows which are related to each other and transfer their data to another handling mechanism
                 if(
                     row['Operation'] === 'Added liquidity'
@@ -210,7 +210,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 }
                 // Handle "Liquidity mining reward (d)A+-BBB(B)"
                 if(/^Liquidity mining reward (?:d)?[A-Z]+-[A-Z]{3,4}$/.test(row['Operation'])){
-                    data['Type'] = (row['Coin/Asset'] === 'DFI' && !noAutoStakeRewards) ? translatedCtTypes.staking : translatedCtTypes.income;
+                    data['Type'] = translatedCtTypes.income;
                     data['Trade-Group'] = 'Liquidity Mining';
                     data['Buy Currency'] = row['Coin/Asset'];
                     data['Buy Amount'] = row['Amount'].replace('-','');
