@@ -164,6 +164,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
             case 'Signup bonus':
             case 'Promotion bonus':
             case 'Entry staking wallet: Referral signup bonus':
+            case 'Entry staking wallet: Signup bonus':
             case 'Freezer promotion bonus':
             case 'Entry staking wallet: Freezer promotion bonus':
                 data['Type'] = translatedCtTypes.income;
@@ -175,7 +176,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
             default:
                 let notHandledOperation = row['Operation'];
                 // Temprary exclude this operations from handling
-                // It seems like this operation 'Entry staking wallet' is the ngetaiv counterpart to all staking related income operations
+                // It seems like this operation 'Entry staking wallet' is the negativ counterpart to all staking related income operations
                 // 'Exit staking wallet' is triggred when coins are unstaked
                 // This might be usefull for a tax related "virtual" separation of staking and non-staking wallets
                 if (row['Operation'] === 'Entry staking wallet' || row['Operation'] === 'Exit staking wallet') {

@@ -67,6 +67,7 @@ cake2ct --cake-csv "path\to\cake-export-file.csv" --ct-csv "path\to\cointracking
 - Exit staking wallet
 - Referral reward
 - Referral signup bonus
+- Entry staking wallet: Signup bonus
 - Entry staking wallet: Referral signup bonus
 - Promotion bonus
 - Lending reward
