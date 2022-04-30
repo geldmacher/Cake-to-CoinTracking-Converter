@@ -45,10 +45,10 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 data['Trade-Group'] = 'Liquidity Mining';
                 data['Buy Currency'] = row['Buy Coin/Asset'];
                 data['Buy Amount'] = row['Buy Amount'].replace('-','');
-                data['Buy Value in your Account Currency'] = useCtFiatValuation ? row['Buy FIAT value'].replace('-','') : '';
+                data['Buy Value in your Account Currency'] = useCtFiatValuation ? '' : row['Buy FIAT value'].replace('-','');
                 data['Sell Currency'] = row['Sell Coin/Asset'];
                 data['Sell Amount'] = row['Sell Amount'].replace('-','');
-                data['Sell Value in your Account Currency'] = useCtFiatValuation ? row['Sell FIAT value'].replace('-','') : '';
+                data['Sell Value in your Account Currency'] = useCtFiatValuation ? '' : row['Sell FIAT value'].replace('-','');
                 break;
             case 'Freezer liquidity mining bonus':
                 data['Type'] = translatedCtTypes.income;
@@ -62,37 +62,37 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
                 data['Trade-Group'] = 'Swap';
                 data['Buy Currency'] = row['Buy Coin/Asset'];
                 data['Buy Amount'] = row['Buy Amount'].replace('-','');
-                data['Buy Value in your Account Currency'] = useCtFiatValuation ? row['Buy FIAT value'].replace('-','') : '';
+                data['Buy Value in your Account Currency'] = useCtFiatValuation ? '' : row['Buy FIAT value'].replace('-','');
                 data['Sell Currency'] = row['Sell Coin/Asset'];
                 data['Sell Amount'] = row['Sell Amount'].replace('-','');
-                data['Sell Value in your Account Currency'] = useCtFiatValuation ? row['Sell FIAT value'].replace('-','') : '';
+                data['Sell Value in your Account Currency'] = useCtFiatValuation ? '' : row['Sell FIAT value'].replace('-','');
                 break;
             case 'Swap trade (DeFiChain DEX)': // Custom operation (@see ./augmentDexSwapRecords.js)
                 data['Type'] = translatedCtTypes.trade;
                 data['Trade-Group'] = 'Swap';
                 data['Buy Currency'] = row['Buy Coin/Asset'];
                 data['Buy Amount'] = row['Buy Amount'].replace('-','');
-                data['Buy Value in your Account Currency'] = useCtFiatValuation ? row['Buy FIAT value'].replace('-','') : '';
+                data['Buy Value in your Account Currency'] = useCtFiatValuation ? '' : row['Buy FIAT value'].replace('-','');
                 data['Sell Currency'] = row['Sell Coin/Asset'];
                 data['Sell Amount'] = row['Sell Amount'].replace('-','');
-                data['Sell Value in your Account Currency'] = useCtFiatValuation ? row['Sell FIAT value'].replace('-','') : '';
+                data['Sell Value in your Account Currency'] = useCtFiatValuation ? '' : row['Sell FIAT value'].replace('-','');
                 break;
             case 'Swap trade fee (DeFiChain DEX)': // Custom operation (@see ./augmentDexSwapRecords.js)
                 data['Type'] = translatedCtTypes.other_fee;
                 data['Trade-Group'] = 'Swap';
                 data['Sell Currency'] = row['Sell Coin/Asset'];
                 data['Sell Amount'] = row['Sell Amount'].replace('-','');
-                data['Sell Value in your Account Currency'] = useCtFiatValuation ? row['Sell FIAT value'].replace('-','') : '';
+                data['Sell Value in your Account Currency'] = useCtFiatValuation ? '' : row['Sell FIAT value'].replace('-','');
                 break;
             case 'Discount trade': // Custom operation (@see ./augmentDiscountRecords.js)
                 data['Type'] = translatedCtTypes.trade;
                 data['Trade-Group'] = 'Discount';
                 data['Buy Currency'] = row['Buy Coin/Asset'];
                 data['Buy Amount'] = row['Buy Amount'].replace('-','');
-                data['Buy Value in your Account Currency'] = useCtFiatValuation ? row['Buy FIAT value'].replace('-','') : '';
+                data['Buy Value in your Account Currency'] = useCtFiatValuation ? '' : row['Buy FIAT value'].replace('-','');
                 data['Sell Currency'] = row['Sell Coin/Asset'];
                 data['Sell Amount'] = row['Sell Amount'].replace('-','');
-                data['Sell Value in your Account Currency'] = useCtFiatValuation ? row['Sell FIAT value'].replace('-','') : '';
+                data['Sell Value in your Account Currency'] = useCtFiatValuation ? '' : row['Sell FIAT value'].replace('-','');
                 break;
             case 'Deposit':
                 // Deposit operations with a reference ID are handled via DeFiChain DEX
