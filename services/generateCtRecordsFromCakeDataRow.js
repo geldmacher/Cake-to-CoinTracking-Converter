@@ -165,6 +165,7 @@ const generateCtRecordsFromCakeDataRow = (row, translatedCtTypes, useCtFiatValua
             case 'Promotion bonus':
             case 'Entry staking wallet: Referral signup bonus':
             case 'Entry staking wallet: Signup bonus':
+            case 'Entry staking wallet: Promotion bonus':
             case 'Freezer promotion bonus':
             case 'Entry staking wallet: Freezer promotion bonus':
                 data['Type'] = translatedCtTypes.income;

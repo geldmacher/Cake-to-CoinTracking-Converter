@@ -45,6 +45,7 @@ const updateStats = (record) => {
         case 'Signup bonus':
         case 'Promotion bonus':
         case 'Entry staking wallet: Signup bonus':
+        case 'Entry staking wallet: Promotion bonus':
         case 'Entry staking wallet: Referral signup bonus':
         case 'Entry staking wallet: Bonus/Airdrop':
         case 'Entry staking wallet: Freezer promotion bonus':
